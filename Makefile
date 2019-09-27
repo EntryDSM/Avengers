@@ -4,11 +4,6 @@ init:
 	pip install pipenv
 	pipenv sync --dev
 
-check:
-	isort --recursive --check-only avengers tests
-	black -S -l 79 --check avengers tests
-	pylint avengers
-
 format:
 	isort -rc -y avengers tests
 	black -S -l 79 avengers tests

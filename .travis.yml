@@ -23,7 +23,6 @@ install:
   - make
 
 script:
-  - pipenv run make check
   - pipenv run make test
 
 after_success:

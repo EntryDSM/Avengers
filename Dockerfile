@@ -5,6 +5,9 @@ RUN pip install -U pip
 # Build Stage
 FROM base AS build
 
+ENV GITHUB_TOKEN $GITHUB_TOKEN
+ENV RUN_ENV $RUN_ENV
+
 RUN apt-get update && \
     apt-get install -y \
         build-essential \
@@ -30,6 +33,8 @@ RUN pip install -r /wheels/requirements.txt -f /wheels && \
 WORKDIR /app
 
 COPY avengers avengers
+
+EXPOSE 80
 
 ENTRYPOINT ["python"]
 CMD ["-m", "avengers"]

@@ -9,10 +9,17 @@ black = "==19.3b0"
 pylint = "==2.3.1"
 pytest = "==4.6.3"
 pytest-cov = "==2.7.1"
+pytest-redis = "*"
+pytest-mysql = "*"
+pytest-asyncio = "*"
 
 [packages]
 sanic = "==19.6.2"
-sentry-sdk = "==0.10.2"
+marshmallow = "==3.2.0"
+aiomysql = "==0.0.20"
+aioredis = "==1.3.0"
+entry-logger-sanic = "==0.1.4"
+hvac = "==0.9.5"
 
 [requires]
 python_version = "3.7"
