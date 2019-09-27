@@ -9,15 +9,8 @@ format:
 	black -S -l 79 avengers tests
 
 test:
-	python -m pytest
+	python -m pytest --cov=./avengers ./tests
 
-coverage:
-	python -m pytest --cov avengers --cov-report term --cov-report xml
-
-htmlcov:
-	python -m pytest --cov avengers --cov-report html
-	rm -rf /tmp/htmlcov && mv htmlcov /tmp/
-	open /tmp/htmlcov/index.html
 
 requirements:
 	pipenv lock -r > requirements.txt
