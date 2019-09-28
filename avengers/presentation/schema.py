@@ -66,12 +66,12 @@ class PersonalInformation(Schema):
     parent_tel = String(
         required=True,
         allow_none=True,
-        validate=validate.Regexp(r"^\d{3}-\d{3,4}-\d{4}$"),
+        validate=validate.Regexp(r"^01\d{8,9}$"),
     )  # phone number regex
     applicant_tel = String(
         required=True,
         allow_none=True,
-        validate=validate.Regexp(r"^\d{3}-\d{3,4}-\d{4}$"),
+        validate=validate.Regexp(r"^01\d{8,9}$"),
     )
     address = String(
         required=True,
@@ -93,7 +93,7 @@ class PersonalInformationWithSchoolInfo(Schema):
     school_tel = String(
         required=True,
         allow_none=True,
-        validate=validate.Regexp(r"^\d{3}-\d{3,4}-\d{4}$"),
+        validate=validate.Regexp(r"^01\d{8,9}$"),
     )
 
 
