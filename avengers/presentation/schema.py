@@ -45,7 +45,7 @@ class Classification(Schema):
     additional_type = String(
         required=True,
         allow_none=True,
-        validate=validate.OneOf(["NATIONAL_MERIT", "PRIVILEGED_ADMISSION"]),
+        validate=validate.OneOf(["NATIONAL_MERIT", "PRIVILEGED_ADMISSION", "NOT_APPLICABLE"]),
     )
     is_daejeon = Boolean(required=True, allow_none=True)
 
@@ -86,7 +86,7 @@ class PersonalInformation(Schema):
     )
 
 
-class UngraduatedPersonalInformation(Schema):
+class PersonalInformationWithSchoolInfo(Schema):
     student_number = String(
         required=True, allow_none=True, validate=validate.Regexp(r"\d{5}")
     )
@@ -286,7 +286,7 @@ class GEDApplicationRequestSchema(Schema):
 class GraduatedApplicationRequestSchema(Schema):
     classification = Nested(Classification, required=True, allow_none=False)
     personal_information = Nested(
-        UngraduatedPersonalInformation, required=True, allow_none=False
+        PersonalInformationWithSchoolInfo, required=True, allow_none=False
     )
     diligence_grade = Nested(DiligenceGrade, required=True, allow_none=False)
     school_grade = Nested(
