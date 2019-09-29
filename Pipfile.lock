@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "75a79e3aa9d948e86cbcb1367d4be95fe686dc284ac808abc3818613c87b2a6f"
+            "sha256": "3596e7175d70290eba60789a1934c6ec3c8b8055d7f01e73352b451ec9a3f3b7"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -270,6 +270,13 @@
                 "sha256:9ec760cbb251c158c19d6c88c17ca00a8632bac713890e465b2be01fdc30713f"
             ],
             "version": "==0.9.2"
+        },
+        "pypika": {
+            "hashes": [
+                "sha256:e7a1d1055b8ca85f22642170bcd399b1120a70f3185e802faf233a15b284a56b"
+            ],
+            "index": "pypi",
+            "version": "==0.35.8"
         },
         "requests": {
             "hashes": [

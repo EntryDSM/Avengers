@@ -20,6 +20,7 @@ aiomysql = "==0.0.20"
 aioredis = "==1.3.0"
 entry-logger-sanic = "==0.1.4"
 hvac = "==0.9.5"
+pypika = "*"
 
 [requires]
 python_version = "3.7"

@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 
 import aiomysql
 
+from avengers.data.exc import DataNotFoundError
 from avengers.data.utils import mysql_exception_handling
 
 
@@ -105,5 +106,8 @@ class MySQLConnection:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 await cur.execute(query, args)
                 result = await cur.fetchone()
+
+        if not result:
+            raise DataNotFoundError
 
         return result
