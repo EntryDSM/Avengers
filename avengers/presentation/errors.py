@@ -34,8 +34,12 @@ class ErrorDescriptions:
     ERR_DATABASE = "Something went wrong."
 
     ERR_APPLICATION_PATCH_VALIDATION = "Invalid application submitted."
-    ERR_APPLICATION_FINAL_SUBMIT_VALIDATION = "Please fill out all column before final submit."
-    ERR_ALREADY_FINAL_SUBMITTED = "Final submitted application can't be edited."
+    ERR_APPLICATION_FINAL_SUBMIT_VALIDATION = (
+        "Please fill out all column before final submit."
+    )
+    ERR_ALREADY_FINAL_SUBMITTED = (
+        "Final submitted application can't be edited."
+    )
     ERR_ANY_APPLICATION_SUBMITTED_YET = "Any application submitted yet."
 
     ERR_USER_NOT_FOUND = "Login information is incorrect"

@@ -1,131 +1,126 @@
--- EntryDSM 4.0 TFT DDL
+DROP SCHEMA IF EXISTS entrydsm ;
 
-CREATE DATABASE IF NOT EXISTS entry4;
+CREATE SCHEMA IF NOT EXISTS entrydsm DEFAULT CHARACTER SET utf8mb4 ;
+USE entrydsm ;
 
-use entry4;
+create table if not exists school
+(
+    code             varchar(10)  not null
+        primary key,
+    school_name      varchar(50)  not null,
+    school_full_name varchar(100) null,
+    education_office varchar(50)  null
+);
 
-CREATE TABLE `unauthorized_applicant` (
-  `email` varchar(320) NOT NULL,
-  `password` varchar(320) NOT NULL DEFAULT '',
-  `verification_code` varchar(50) NOT NULL,
-  PRIMARY KEY (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `admin` (
-  `admin_id` varchar(45) NOT NULL,
-  `admin_password` varchar(93) NOT NULL DEFAULT '',
-  `admin_type` varchar(32) NOT NULL,
-  `admin_email` varchar(320) NOT NULL,
-  `admin_name` varchar(13) NOT NULL,
-  PRIMARY KEY (`admin_id`),
-  KEY `type_index` (`admin_type`),
-  KEY `name_index` (`admin_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `applicant` (
-  `email` varchar(320) NOT NULL,
-  `password` varchar(93) NOT NULL DEFAULT '',
-  `applicant_name` varchar(13) DEFAULT NULL,
-  `sex` varchar(12) DEFAULT NULL,
-  `birth_date` date DEFAULT NULL,
-  `parent_name` varchar(13) DEFAULT NULL,
-  `parent_tel` varchar(12) DEFAULT NULL,
-  `applicant_tel` varchar(12) DEFAULT NULL,
-  `address` varchar(500) DEFAULT NULL,
-  `post_code` varchar(5) DEFAULT NULL,
-  `image_path` varchar(256) DEFAULT NULL,
+create table if not exists user
+(
+    email    varchar(100) not null
+        primary key,
+    password varchar(100) not null,
+    receipt_code                   int               null,
+    is_paid                        tinyint default 0 null,
+    is_printed_application_arrived tinyint default 0 null,
+    is_passed_first_apply          tinyint default 0 null,
+    is_passed_interview            tinyint default 0 null,
+    is_final_submit                tinyint default 0 null,
+    exam_code                      varchar(6)        null,
+    volunteer_score  decimal(10, 5) null,
+    attendance_score int            null,
+    conversion_score decimal(10, 5) null,
+    final_score      decimal(10, 5) null
+)
+    collate = utf8mb4_unicode_ci;
 
 
-  PRIMARY KEY (`email`),
-  UNIQUE KEY `applicant_tel_UNIQUE` (`applicant_tel`),
-  UNIQUE KEY `image_path_UNIQUE` (`image_path`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+create table if not exists ged_application
+(
+    user_email        varchar(100)                                                                                                                                                           not null
+        primary key,
+    apply_type        varchar(45) null,
+    additional_type   varchar(45) null,
+    is_daejeon        tinyint                                                                                                                                                                null,
+    name              varchar(15)                                                                                                                                                            null,
+    sex               varchar(45) null,
+    birth_date        date                                                                                                                                                                   null,
+    parent_name       varchar(15)                                                                                                                                                            null,
+    parent_tel        varchar(9)                                                                                                                                                             null,
+    applicant_tel     varchar(9)                                                                                                                                                             null,
+    address           varchar(500)                                                                                                                                                           null,
+    post_code         varchar(5)                                                                                                                                                             null,
+    ged_average_score int                                                                                                                                                                    null,
+    self_introduction varchar(1600)                                                                                                                                                          null,
+    study_plan        varchar(1600)                                                                                                                                                          null
+)
+    collate = utf8mb4_unicode_ci;
 
-CREATE TABLE `applicant_status` (
-  `applicant_email` varchar(320) NOT NULL,
-  `receipt_code` int(3) unsigned zerofill NOT NULL AUTO_INCREMENT,
-  `is_paid` tinyint(4) NOT NULL DEFAULT '0',
-  `is_printed_application_arrived` tinyint(4) NOT NULL DEFAULT '0',
-  `is_passed_first_apply` tinyint(4) NOT NULL DEFAULT '0',
-  `is_final_submit` tinyint(4) NOT NULL DEFAULT '0',
-  `exam_code` varchar(6) DEFAULT NULL,
-
-
-  PRIMARY KEY (`applicant_email`),
-  UNIQUE KEY `receipt_code_UNIQUE` (`receipt_code`),
-  UNIQUE KEY `exam_code_UNIQUE` (`exam_code`),
-  KEY `fk_applicant_status_applicant_idx` (`applicant_email`),
-  CONSTRAINT `fk_applicant_status_applicant` FOREIGN KEY (`applicant_email`) REFERENCES `applicant` (`email`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `academic_information` (
-  `applicant_email` varchar(320) NOT NULL,
-  `school_code` varchar(10) NOT NULL,
-  `student_class` varchar(2) DEFAULT NULL,
-  `student_number` varchar(2) DEFAULT NULL,
-  `academic_tel` varchar(12) DEFAULT NULL,
-
-
-  PRIMARY KEY (`applicant_email`),
-  KEY `fk_academic_information_school_idx` (`school_code`),
-  CONSTRAINT `fk_academic_information_school` FOREIGN KEY (`school_code`) REFERENCES `school` (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `applicant_document` (
-  `applicant_email` varchar(320) NOT NULL,
-  `self_introduction_text` text,
-  `study_plan_text` text,
-
-
-  PRIMARY KEY (`applicant_email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `applicant_score` (
-  `applicant_email` varchar(320) NOT NULL,
-  `volunteer_time` int(11) DEFAULT NULL,
-  `full_cut_count` int(11) DEFAULT NULL,
-  `period_cut_count` int(11) DEFAULT NULL,
-  `late_count` int(11) DEFAULT NULL,
-  `early_leave_count` int(11) DEFAULT NULL,
-  `volunteer_score` decimal(10,5) DEFAULT NULL,
-  `attendance_score` int(11) DEFAULT NULL,
-  `conversion_score` decimal(10,5) DEFAULT NULL,
-  `ged_average_score` decimal(10,5) DEFAULT NULL,
-  `final_score` decimal(10,5) DEFAULT NULL,
-
-
-  PRIMARY KEY (`applicant_email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `classification` (
-  `applicant_email` varchar(320) NOT NULL,
-  `apply_type` varchar(45) DEFAULT NULL,
-  `is_ged` tinyint(4) DEFAULT NULL,
-  `is_daejeon` tinyint(4) DEFAULT NULL,
-  `is_graduated` tinyint(4) DEFAULT NULL,
-  `additional_type` varchar(45) DEFAULT NULL,
-  `social_detail_type` varchar(45) DEFAULT NULL,
+create table if not exists graduated_application
+(
+    user_email        varchar(100)                                                                                                                                                           not null
+        primary key,
+    apply_type        varchar(45) null,
+    additional_type    varchar(45) null,
+    is_daejeon        tinyint                                                                                                                                                                null,
+    name              varchar(15)                                                                                                                                                            null,
+    sex               varchar(45) null,
+    birth_date        date                                                                                                                                                                   null,
+    parent_name       varchar(15)                                                                                                                                                            null,
+    parent_tel        varchar(9)                                                                                                                                                             null,
+    applicant_tel     varchar(9)                                                                                                                                                             null,
+    address           varchar(500)                                                                                                                                                           null,
+    post_code         varchar(5)                                                                                                                                                             null,
+    student_number    varchar(5)                                                                                                                                                             null,
+    school_code       varchar(10)                                                                                                                                                            null,
+    school_tel        varchar(9)                                                                                                                                                             null,
+    volunteer_time    int                                                                                                                                                                    null,
+    full_cut_count    int                                                                                                                                                                    null,
+    period_cut_count  int                                                                                                                                                                    null,
+    late_count        int                                                                                                                                                                    null,
+    early_leave_count int                                                                                                                                                                    null,
+    korean            varchar(6)                                                                                                                                                             null,
+    social            varchar(6)                                                                                                                                                             null,
+    history           varchar(6)                                                                                                                                                             null,
+    math              varchar(6)                                                                                                                                                             null,
+    science           varchar(6)                                                                                                                                                             null,
+    tech_and_home     varchar(6)                                                                                                                                                             null,
+    english           varchar(6)                                                                                                                                                             null,
+    self_introduction  varchar(1600)                                                                                                                                                          null,
+    study_plan        varchar(1600)                                                                                                                                                          null
+)
+    collate = utf8mb4_unicode_ci;
 
 
-  `graudated_year` varchar(4) DEFAULT NULL,
-  PRIMARY KEY (`applicant_email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+create table if not exists ungraduated_application
+(
+    user_email        varchar(100)                                                                                                                                                           not null
+        primary key,
+    apply_type        varchar(45) null,
+    additional_type   varchar(45) null,
+    is_daejeon        tinyint                                                                                                                                                                null,
+    name              varchar(15)                                                                                                                                                            null,
+    sex               varchar(45) null,
+    birth_date        date                                                                                                                                                                   null,
+    parent_name       varchar(15)                                                                                                                                                            null,
+    parent_tel        varchar(9)                                                                                                                                                             null,
+    applicant_tel     varchar(9)                                                                                                                                                             null,
+    address           varchar(500)                                                                                                                                                           null,
+    post_code         varchar(5)                                                                                                                                                             null,
+    student_number    varchar(5)                                                                                                                                                             null,
+    school_code       varchar(10)                                                                                                                                                            null,
+    school_tel        varchar(9)                                                                                                                                                             null,
+    volunteer_time    int                                                                                                                                                                    null,
+    full_cut_count    int                                                                                                                                                                    null,
+    period_cut_count  int                                                                                                                                                                    null,
+    late_count        int                                                                                                                                                                    null,
+    early_leave_count int                                                                                                                                                                    null,
+    korean            varchar(5)                                                                                                                                                             null,
+    social            varchar(5)                                                                                                                                                             null,
+    history           varchar(5)                                                                                                                                                             null,
+    math              varchar(5)                                                                                                                                                             null,
+    science           varchar(5)                                                                                                                                                             null,
+    tech_and_home     varchar(5)                                                                                                                                                             null,
+    english           varchar(5)                                                                                                                                                             null,
+    self_introduction  varchar(1600)                                                                                                                                                          null,
+    study_plan        varchar(1600)                                                                                                                                                          null
+)
+    collate = utf8mb4_unicode_ci;
 
-CREATE TABLE `grade_by_semester` (
-  `applicant_email` varchar(320) NOT NULL,
-  `subject` varchar(45) NOT NULL,
-  `semester` int(10) unsigned NOT NULL,
-  `score` varchar(1) DEFAULT NULL,
-
-
-  PRIMARY KEY (`applicant_email`,`subject`,`semester`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE `school` (
-  `code` varchar(10) NOT NULL,
-  `school_name` varchar(50) DEFAULT NULL,
-  `school_full_name` varchar(60) DEFAULT NULL,
-  `education_office` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`code`),
-  KEY `school_name` (`school_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -45,7 +45,9 @@ class Classification(Schema):
     additional_type = String(
         required=True,
         allow_none=True,
-        validate=validate.OneOf(["NATIONAL_MERIT", "PRIVILEGED_ADMISSION", "NOT_APPLICABLE"]),
+        validate=validate.OneOf(
+            ["NATIONAL_MERIT", "PRIVILEGED_ADMISSION", "NOT_APPLICABLE"]
+        ),
     )
     is_daejeon = Boolean(required=True, allow_none=True)
 

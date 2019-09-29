@@ -6,11 +6,9 @@ from avengers.data.utils import mysql_exception_handling
 
 
 class MySQLConnection:
-    _read_pool: aiomysql.Pool = None
-    _write_pool: aiomysql.Pool = None
+    _read_pool: aiomysql.Pool
+    _write_pool: aiomysql.Pool
     _connection_info = None
-
-    is_available = not (_read_pool and _write_pool)
 
     @classmethod
     @mysql_exception_handling
@@ -29,9 +27,6 @@ class MySQLConnection:
         if cls._write_pool is not None:
             cls._write_pool.close()
             await cls._write_pool.wait_closed()
-
-        cls._read_pool = None
-        cls._write_pool = None
 
     @classmethod
     @mysql_exception_handling
