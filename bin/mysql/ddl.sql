@@ -47,7 +47,7 @@ create table if not exists ged_application
     applicant_tel     varchar(9)                                                                                                                                                             null,
     address           varchar(500)                                                                                                                                                           null,
     post_code         varchar(5)                                                                                                                                                             null,
-    ged_average_score int                                                                                                                                                                    null,
+    ged_average_score decimal(10, 5)                                                                                                                                                         null,
     self_introduction varchar(1600)                                                                                                                                                          null,
     study_plan        varchar(1600)                                                                                                                                                          null
 )

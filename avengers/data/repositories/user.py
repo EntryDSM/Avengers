@@ -1,7 +1,7 @@
+from dacite import from_dict
 from pypika import Parameter, Query, Table
 
 from avengers.data.exc import DataNotFoundError
-from avengers.data.mappers.user import to_model
 from avengers.data.models.user import UserModel
 from avengers.data.repositories import MySqlRepository
 
@@ -26,7 +26,9 @@ class UserRepository(MySqlRepository):
             USER_TBL.final_score,
         ).where(USER_TBL.email == Parameter("%s")).get_sql(quote_char=None)
 
-        return to_model(await self.db.fetchone(query, email))
+        return from_dict(
+            data_class=UserModel, data=await self.db.fetchone(query, email)
+        )
 
     async def upsert(self, new_data: UserModel) -> None:
         try:
