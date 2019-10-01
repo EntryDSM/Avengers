@@ -22,6 +22,9 @@ class ErrorCodes:
     signup_already_requested = 1302
     invalid_verification_key = 1303
 
+    # code 14xx email error
+    failed_to_send_email = 1400
+
     def __getattribute__(self, attribute):
         return attribute
 
@@ -49,6 +52,8 @@ class ErrorDescriptions:
     ERR_USER_ALREADY_EXISTS = "Email is in use."
     ERR_SIGNUP_ALREADY_REQUESTED = "Signup verification email already sent"
     ERR_INVALID_VERIFICATION_KEY = "Invalid or expired verification key"
+
+    ERR_FAILED_TO_SEND_EMAIL = "Failed to send email. Please contact a service manager."
 
     def __getattribute__(self, attribute):
         return attribute

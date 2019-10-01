@@ -83,3 +83,9 @@ class SignupAlreadyRequested(AvengersException):
 class InvalidVerificationKey(AvengersException):
     error_code = error_codes.invalid_verification_key
     description = descriptions.ERR_INVALID_VERIFICATION_KEY
+
+
+@add_status_code(401)
+class FailedToSendEmail(AvengersException):
+    error_code = error_codes.failed_to_send_email
+    description = descriptions.ERR_FAILED_TO_SEND_EMAIL
