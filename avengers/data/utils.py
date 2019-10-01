@@ -20,7 +20,7 @@ def redis_exception_handling(fn):
             logger.critical(traceback.format_exc())
             raise RedisOperationError
 
-    return
+    return wrapper
 
 
 def mysql_exception_handling(fn):
