@@ -69,6 +69,7 @@ create table if not exists graduated_application
     address           varchar(500)                                                                                                                                                           null,
     post_code         varchar(5)                                                                                                                                                             null,
     student_number    varchar(5)                                                                                                                                                             null,
+    graduated_year    varchar(4)                                                                                                                                                             null,
     school_code       varchar(10)                                                                                                                                                            null,
     school_tel        varchar(9)                                                                                                                                                             null,
     volunteer_time    int                                                                                                                                                                    null,
