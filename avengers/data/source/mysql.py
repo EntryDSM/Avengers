@@ -7,8 +7,8 @@ from avengers.data.utils import mysql_exception_handling
 
 
 class MySQLConnection:
-    _read_pool: aiomysql.Pool
-    _write_pool: aiomysql.Pool
+    _read_pool: aiomysql.Pool = None
+    _write_pool: aiomysql.Pool = None
     _connection_info = None
 
     @classmethod

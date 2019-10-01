@@ -3,7 +3,7 @@ from pypika import Parameter, Query, Table
 
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.graduated_application import (
-    GraduatedApplicationModel,
+    GraduatedApplicationModelBase,
 )
 from avengers.data.repositories import MySqlRepository
 
@@ -11,7 +11,7 @@ GRADUATED_APPLICATION_TBL = Table('graduated_application')
 
 
 class GraduatedApplicationRepository(MySqlRepository):
-    async def get(self, email: str) -> GraduatedApplicationModel:
+    async def get(self, email: str) -> GraduatedApplicationModelBase:
         query: str = Query.from_(GRADUATED_APPLICATION_TBL).select(
             GRADUATED_APPLICATION_TBL.user_email,
             GRADUATED_APPLICATION_TBL.apply_type,
@@ -26,6 +26,7 @@ class GraduatedApplicationRepository(MySqlRepository):
             GRADUATED_APPLICATION_TBL.address,
             GRADUATED_APPLICATION_TBL.post_code,
             GRADUATED_APPLICATION_TBL.student_number,
+            GRADUATED_APPLICATION_TBL.graduated_year,
             GRADUATED_APPLICATION_TBL.school_code,
             GRADUATED_APPLICATION_TBL.school_tel,
             GRADUATED_APPLICATION_TBL.volunteer_time,
@@ -47,11 +48,11 @@ class GraduatedApplicationRepository(MySqlRepository):
         )
 
         return from_dict(
-            data_class=GraduatedApplicationModel,
+            data_class=GraduatedApplicationModelBase,
             data=await self.db.fetchone(query, email),
         )
 
-    async def upsert(self, new_data: GraduatedApplicationModel) -> None:
+    async def upsert(self, new_data: GraduatedApplicationModelBase) -> None:
         try:
             past_data = await self.get(new_data.user_email)
         except DataNotFoundError:
@@ -61,7 +62,7 @@ class GraduatedApplicationRepository(MySqlRepository):
         finally:
             await self.insert(new_data)
 
-    async def insert(self, data: GraduatedApplicationModel):
+    async def insert(self, data: GraduatedApplicationModelBase):
         query: str = Query.into(GRADUATED_APPLICATION_TBL).insert(
             data.user_email,
             data.apply_type,
@@ -76,6 +77,7 @@ class GraduatedApplicationRepository(MySqlRepository):
             data.address,
             data.post_code,
             data.student_number,
+            data.graduated_year,
             data.school_code,
             data.school_tel,
             data.volunteer_time,

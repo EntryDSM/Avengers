@@ -85,7 +85,7 @@ class PersonalInformation(Schema):
     )
 
 
-class PersonalInformationWithSchoolInfo(Schema):
+class PersonalInformationWithCurrentSchoolInfo(Schema):
     student_number = String(
         required=True, allow_none=True, validate=validate.Regexp(r"\d{5}")
     )
@@ -96,6 +96,12 @@ class PersonalInformationWithSchoolInfo(Schema):
         required=True,
         allow_none=True,
         validate=validate.Regexp(r"^01\d{8,9}$"),
+    )
+
+
+class PersonalInformationWitGraduatedSchoolInfo(PersonalInformationWithCurrentSchoolInfo):
+    graduated_year = String(
+        required=True, allow_none=True, validate=[validate.Regexp(r"^\d{4}$"), validate.Length(equal=4)]
     )
 
 
@@ -285,7 +291,7 @@ class GEDApplicationRequestSchema(Schema):
 class GraduatedApplicationRequestSchema(Schema):
     classification = Nested(Classification, required=True, allow_none=False)
     personal_information = Nested(
-        PersonalInformationWithSchoolInfo, required=True, allow_none=False
+        PersonalInformationWitGraduatedSchoolInfo, required=True, allow_none=False
     )
     diligence_grade = Nested(DiligenceGrade, required=True, allow_none=False)
     school_grade = Nested(
@@ -297,6 +303,9 @@ class GraduatedApplicationRequestSchema(Schema):
 
 
 class UngraduatedApplicationRequestSchema(GraduatedApplicationRequestSchema):
+    personal_information = Nested(
+        PersonalInformationWithCurrentSchoolInfo, required=True, allow_none=False
+    )
     school_grade = Nested(
         UngraduatedSchoolGrade, required=True, allow_none=False
     )

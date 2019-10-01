@@ -20,7 +20,7 @@ class BaseApplication:
 
 
 @dataclass(frozen=True)
-class UnGedApplication(BaseApplication):
+class BaseCommonApplication(BaseApplication):
     student_number: Optional[str]
     school_code: Optional[str]
     school_tel: Optional[str]
