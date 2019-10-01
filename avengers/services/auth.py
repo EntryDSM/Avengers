@@ -6,7 +6,8 @@ from avengers.data.exc import DataNotFoundError
 from avengers.data.models.unauthorized_user import UnauthorizedUserModel
 from avengers.data.repositories.unauthorized_user import UnauthorizedUserRepository
 from avengers.data.repositories.user import UserRepository
-from avengers.presentation.exceptions import UserAlreadyExists, InvalidSignupInfo, SignupAlreadyRequested
+from avengers.presentation.exceptions import UserAlreadyExists, InvalidSignupInfo, SignupAlreadyRequested, \
+    InvalidVerificationKey
 from avengers.services import send_mail
 
 
@@ -37,7 +38,11 @@ class AuthService:
 
         return json(dict(msg="Verification code and link sent to your email."), 204)
 
-    async def verify_key(self, request: Request):
+    async def verify_key(self, verify_key: str):
+        user = await self.unauthorized_user_repository.find_by_uuid(verify_key)
+        if not user:
+            raise InvalidVerificationKey()
+
         ...
 
     async def login(self, request: Request):

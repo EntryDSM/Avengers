@@ -17,6 +17,12 @@ class UnauthorizedUserRepository(RedisRepository):
             data=await self.db.get(uuid5(NAMESPACE_URL, email))
         )
 
+    async def find_by_uuid(self, uuid: str) -> UnauthorizedUserModel:
+        return from_dict(
+            data_class=UnauthorizedUserModel,
+            data=await self.db.get(uuid)
+        )
+
     async def save(self, user: UnauthorizedUserModel) -> None:
         await self.db.set(
             key=BASE_KEY.format(uuid5(NAMESPACE_URL, user.email)),
