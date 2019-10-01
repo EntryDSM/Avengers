@@ -1,14 +1,13 @@
-from uuid import uuid5, NAMESPACE_URL
 from sanic.request import Request
 from sanic.response import json
 
 from avengers.config import settings
-from avengers.services import send_mail
 from avengers.data.exc import DataNotFoundError
-from avengers.data.repositories.user import UserRepository
 from avengers.data.models.unauthorized_user import UnauthorizedUserModel
 from avengers.data.repositories.unauthorized_user import UnauthorizedUserRepository
+from avengers.data.repositories.user import UserRepository
 from avengers.presentation.exceptions import UserAlreadyExists, InvalidSignupInfo, SignupAlreadyRequested
+from avengers.services import send_mail
 
 
 class AuthService:
