@@ -18,7 +18,7 @@ def redis_exception_handling(fn):
             return await fn(*args, **kwargs)
         except RedisError:
             logger.critical(traceback.format_exc())
-            raise RedisOperationError
+            raise RedisOperationError("")
 
     return wrapper
 
@@ -30,6 +30,6 @@ def mysql_exception_handling(fn):
             return await fn(*args, **kwargs)
         except MySQLError:
             logger.critical(traceback.format_exc())
-            raise MySQLOperationError
+            raise MySQLOperationError("")
 
     return wrapper

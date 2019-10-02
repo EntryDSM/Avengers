@@ -29,14 +29,14 @@ class AuthService:
 
         already_requested = await self.unauthorized_user_repository.find_by_email(email)
         if already_requested:
-            raise SignupAlreadyRequested()
+            raise SignupAlreadyRequested("")
 
         temp_user = UnauthorizedUserModel(email, password)
-        await self.unauthorized_user_repository.save(temp_user)
+        saved = await self.unauthorized_user_repository.save(temp_user)
 
-        send_mail(email, title=settings.signup_email_title, content=settings.signup_email_content)
+        send_mail(email, title=settings.SIGNUP_EMAIL_TITLE, content=settings.SIGNUP_EMAIL_CONTENT.format(saved))
 
-        return json(dict(msg="Verification code and link sent to your email."), 204)
+        return json("Verification code and link sent to your email.", 204)
 
     async def verify_key(self, verify_key: str):
         user = await self.unauthorized_user_repository.find_by_uuid(verify_key)

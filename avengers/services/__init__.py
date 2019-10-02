@@ -14,10 +14,10 @@ def send_mail(address: str, title: str, content: str):
     )
 
     try:
-        client = SendGridAPIClient(settings.sendgrid_api_key)
+        client = SendGridAPIClient(settings.SENDGRID_API_KEY)
         response = client.send(message)
 
         return response.status_code
 
     except BadRequestsError or UnauthorizedError:
-        raise FailedToSendEmail()
+        raise FailedToSendEmail("")

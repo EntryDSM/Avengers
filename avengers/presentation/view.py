@@ -3,7 +3,7 @@ from sanic.views import HTTPMethodView
 from sanic.response import HTTPResponse
 
 from avengers.data.repositories.unauthorized_user import UnauthorizedUserRepository
-from avengers.presentation.blueprint import bp
+from avengers.presentation.exceptions import InvalidSignupInfo
 from avengers.services.auth import AuthService
 from avengers.data.repositories.user import UserRepository
 
@@ -15,6 +15,9 @@ class SignUp(HTTPMethodView):
     )
 
     async def post(self, request: Request) -> HTTPResponse:
+        if not request.json:
+            raise InvalidSignupInfo("")
+
         response = await self.service.sign_up(
             email=request.json.get("email"),
             password=request.json.get("password")
@@ -56,8 +59,3 @@ class UserAuth(HTTPMethodView):
         response = await self.service.logout(request)
 
         return response
-
-
-bp.add_route(SignUp.as_view(), "/signup")
-bp.add_route(SignUpVerify.as_view(), "/signup/verify")
-bp.add_route(UserAuth.as_view(), "/auth")

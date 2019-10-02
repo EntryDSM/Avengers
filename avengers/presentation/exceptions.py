@@ -85,7 +85,7 @@ class InvalidVerificationKey(AvengersException):
     description = descriptions.ERR_INVALID_VERIFICATION_KEY
 
 
-@add_status_code(401)
+@add_status_code(400)
 class FailedToSendEmail(AvengersException):
     error_code = error_codes.failed_to_send_email
     description = descriptions.ERR_FAILED_TO_SEND_EMAIL
