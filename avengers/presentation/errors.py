@@ -59,5 +59,5 @@ class ErrorDescriptions:
         return attribute
 
 
-error_codes = ErrorCodes()
+error_codes = ErrorCodes
 descriptions = ErrorDescriptions()
