@@ -36,4 +36,4 @@ class UnauthorizedUserRepository(RedisRepository):
         return str(uuid)
 
     async def delete(self, verify_key: str) -> None:
-        await self.db.delete(str(verify_key))
+        await self.db.delete(BASE_KEY.format(verify_key))

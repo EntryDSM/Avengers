@@ -4,6 +4,7 @@ from sanic.response import json
 from avengers.config import settings
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.unauthorized_user import UnauthorizedUserModel
+from avengers.data.models.user import UserModel
 from avengers.data.repositories.unauthorized_user import UnauthorizedUserRepository
 from avengers.data.repositories.user import UserRepository
 from avengers.presentation.exceptions import UserAlreadyExists, InvalidSignupInfo, SignupAlreadyRequested, \
@@ -25,7 +26,7 @@ class AuthService:
         except DataNotFoundError:
             pass
         else:
-            raise UserAlreadyExists()
+            raise UserAlreadyExists("")
 
         already_requested = await self.unauthorized_user_repository.find_by_email(email)
         if already_requested:
@@ -39,11 +40,30 @@ class AuthService:
         return json("Verification code and link sent to your email.", 204)
 
     async def verify_key(self, verify_key: str):
-        user = await self.unauthorized_user_repository.find_by_uuid(verify_key)
-        if not user:
-            raise InvalidVerificationKey()
+        temp_user = await self.unauthorized_user_repository.find_by_uuid(verify_key)
+        if not temp_user:
+            raise InvalidVerificationKey("")
 
-        ...
+        user = UserModel(
+            email=temp_user.email,
+            password=temp_user.password,
+            receipt_code=None,
+            is_paid=None,
+            is_printed_application_arrived=None,
+            is_passed_first_apply=None,
+            is_passed_interview=None,
+            is_final_submit=None,
+            exam_code=None,
+            volunteer_score=None,
+            attendance_score=None,
+            conversion_score=None,
+            final_score=None
+        )
+
+        await self.user_repository.insert(user)
+        await self.unauthorized_user_repository.delete(verify_key)
+
+        return json("Verification success", 204)
 
     async def login(self, request: Request):
         ...
