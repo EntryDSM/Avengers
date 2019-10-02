@@ -41,7 +41,7 @@ class UserRepository(MySqlRepository):
             await self.insert(new_data)
 
     async def insert(self, user: UserModel):
-        query: str = Query.into(UserModel).insert(
+        query: str = Query.into(USER_TBL).insert(
             user.email,
             user.password,
             user.receipt_code,
