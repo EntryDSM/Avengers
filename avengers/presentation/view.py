@@ -2,8 +2,9 @@ from sanic.request import Request
 from sanic.views import HTTPMethodView
 from sanic.response import HTTPResponse
 
+from avengers.data.repositories.refresh_token import RefreshTokenRepository
 from avengers.data.repositories.unauthorized_user import UnauthorizedUserRepository
-from avengers.presentation.exceptions import InvalidSignupInfo
+from avengers.presentation.exceptions import InvalidSignupInfo, UserNotFound
 from avengers.services.auth import AuthService
 from avengers.data.repositories.user import UserRepository
 
@@ -42,12 +43,15 @@ class SignUpVerify(HTTPMethodView):
 class UserAuth(HTTPMethodView):
     service = AuthService(
         user_repository=UserRepository(),
-        unauthorized_user_repository=UnauthorizedUserRepository()
+        unauthorized_user_repository=UnauthorizedUserRepository(),
+        refresh_token_repository=RefreshTokenRepository()
     )
 
     async def post(self, request: Request) -> HTTPResponse:
-        response = await self.service.login(request)
+        if not request.json or not request.json.get("email") or not request.json.get("password"):
+            raise UserNotFound("")
 
+        response = await self.service.login(request.json.get("email"), request.json.get("password"), request.app)
         return response
 
     async def patch(self, request: Request) -> HTTPResponse:
