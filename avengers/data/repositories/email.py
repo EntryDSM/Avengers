@@ -20,4 +20,4 @@ def send_mail(address: str, title: str, content: str):
         return response.status_code
 
     except BadRequestsError or UnauthorizedError:
-        raise FailedToSendEmail()
+        raise FailedToSendEmail

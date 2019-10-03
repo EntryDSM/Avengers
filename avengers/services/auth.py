@@ -24,18 +24,18 @@ class AuthService:
 
     async def sign_up(self, email: str, password: str):
         if not email or not password:
-            raise InvalidSignupInfo()
+            raise InvalidSignupInfo
 
         try:
             user_already_exists = await self.user_repository.get(email)
         except DataNotFoundError:
             pass
         else:
-            raise UserAlreadyExists()
+            raise UserAlreadyExists
 
         already_requested = await self.unauthorized_user_repository.find_by_email(email)
         if already_requested:
-            raise SignupAlreadyRequested()
+            raise SignupAlreadyRequested
 
         temp_user = UnauthorizedUserModel(email, generate_password_hash(password))
         saved = await self.unauthorized_user_repository.save(temp_user)
@@ -49,7 +49,7 @@ class AuthService:
     async def verify_key(self, verify_key: str):
         temp_user = await self.unauthorized_user_repository.find_by_uuid(verify_key)
         if not temp_user:
-            raise InvalidVerificationKey()
+            raise InvalidVerificationKey
 
         count_of_users = await self.user_repository.get_count()
         user = UserModel(
@@ -80,10 +80,10 @@ class AuthService:
         try:
             saved = await self.user_repository.get(email)
         except DataNotFoundError:
-            raise UserNotFound()
+            raise UserNotFound
 
         if not check_password_hash(saved.password, password):
-            raise UserNotFound()
+            raise UserNotFound
 
         is_refresh_saved = await self.refresh_token_repository.get(email)
         if is_refresh_saved:
@@ -99,11 +99,11 @@ class AuthService:
         try:
             refresh = request.headers.get("X-Refresh-Token").split("Bearer ")[1]
         except IndexError:
-            raise TokenError("missing 'Bearer '")
+            raise TokenError
 
         email = await self.refresh_token_repository.get_by_refresh(refresh)
         if not email:
-            raise TokenError()
+            raise TokenError
 
         access = await create_access_token(identity=email, app=request.app)
         return json({"access": access}, 201)
@@ -112,11 +112,11 @@ class AuthService:
         try:
             refresh = request.headers.get("X-Refresh-Token").split("Bearer ")[1]
         except IndexError:
-            raise TokenError("missing 'Bearer '")
+            raise TokenError
 
         saved_refresh = await self.refresh_token_repository.get_by_refresh(refresh)
         if not saved_refresh:
-            raise TokenError()
+            raise TokenError
 
         await self.refresh_token_repository.delete(saved_refresh)
         return json(dict(msg="Logout succeed"), 204)
