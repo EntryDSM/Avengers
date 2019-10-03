@@ -8,6 +8,9 @@ class AvengersException(SanicException):
     error_code = error_codes.unknown_internal_server_error
     description = descriptions.ERR_SERVER
 
+    def __init__(self):
+        super().__init__(self.description, self.status_code)
+
 
 @add_status_code(503)
 class RedisOperationError(AvengersException):
