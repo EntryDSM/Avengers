@@ -5,6 +5,7 @@ class ErrorCodes:
     # code 10xx server error
     redis_error = 1002
     mysql_error = 1003
+    failed_to_send_email = 1004
 
     # code 11xx application validation error
     validation_error = 1100
@@ -21,9 +22,6 @@ class ErrorCodes:
     user_already_exists = 1301
     signup_already_requested = 1302
     invalid_verification_key = 1303
-
-    # code 14xx email error
-    failed_to_send_email = 1400
 
     def __getattribute__(self, attribute):
         return attribute

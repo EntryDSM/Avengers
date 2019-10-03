@@ -30,6 +30,11 @@ class UserRepository(MySqlRepository):
             data_class=UserModel, data=await self.db.fetchone(query, email)
         )
 
+    async def get_count(self) -> int:
+        query: str = "SELECT count(*) FROM user"
+
+        return await self.db.execute(query)
+
     async def upsert(self, new_data: UserModel) -> None:
         try:
             past_data = await self.get(new_data.email)
