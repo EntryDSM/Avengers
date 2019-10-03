@@ -22,6 +22,8 @@ entry-logger-sanic = "==0.1.4"
 hvac = "==0.9.5"
 pypika = "*"
 dacite = "*"
+werkzeug = "*"
+sendgrid = "*"
 
 [requires]
 python_version = "3.7"
