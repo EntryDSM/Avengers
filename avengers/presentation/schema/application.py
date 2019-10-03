@@ -1,28 +1,9 @@
 import decimal
-from datetime import date
 
-from marshmallow import Schema
-from marshmallow.fields import Boolean
-from marshmallow.fields import Date as BaseDate
-from marshmallow.fields import Decimal, Email, Integer
-from marshmallow.fields import List as ListField
-from marshmallow.fields import Nested, String, validate
+from marshmallow import Schema, validate
+from marshmallow.fields import String, Boolean, Decimal, Integer, List as ListField, Nested
 
-
-class Date(BaseDate):
-    def _deserialize(self, value, attr, data, **kwargs):
-        if isinstance(value, date):
-            return value
-        return super()._deserialize(value, attr, data)
-
-
-class SignUpRequestSchema(Schema):
-    email = Email(required=True, allow_none=False)
-    password = String(
-        required=True,
-        allow_none=False,
-        validate=validate.Length(min=8, max=64),
-    )
+from avengers.presentation.schema.common import Date
 
 
 class Classification(Schema):
