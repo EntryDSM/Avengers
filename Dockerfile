@@ -5,10 +5,6 @@ RUN pip install -U pip
 # Build Stage
 FROM base AS build
 
-ENV GITHUB_TOKEN $GITHUB_TOKEN
-ENV RUN_ENV $RUN_ENV
-ENV SERVICE_NAME avengers
-
 RUN apt-get update && \
     apt-get install -y \
         build-essential \
@@ -24,6 +20,10 @@ RUN pip wheel -r requirements.txt
 FROM base
 
 ENV PYTHONUNBUFFERED=1
+
+ENV GITHUB_TOKEN $GITHUB_TOKEN
+ENV RUN_ENV $RUN_ENV
+ENV SERVICE_NAME avengers
 
 COPY --from=build /wheels /wheels
 
