@@ -96,7 +96,7 @@ class MySQLConnection:
 
     @classmethod
     @mysql_exception_handling
-    async def fetchone(cls, query: str, *args) -> Dict[str, Any]:
+    async def fetchone(cls, query: str, raise_exception=True, *args) -> Dict[str, Any]:
         pool: aiomysql.Pool = await cls._get_read_pool()
         conn: aiomysql.Connection
         cur: aiomysql.DictCursor
@@ -107,7 +107,7 @@ class MySQLConnection:
                 await cur.execute(query, args)
                 result = await cur.fetchone()
 
-        if not result:
+        if not result and raise_exception:
             raise DataNotFoundError
 
-        return result
+        return result if result else None

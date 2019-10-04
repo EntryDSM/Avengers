@@ -1,0 +1,13 @@
+from typing import List
+
+from avengers.data.repositories import MySqlRepository
+
+
+class SchoolRepository(MySqlRepository):
+    async def search(self, key: str) -> List[str]:
+        query = "SELECT school_full_name FROM school WHERE school_name LIKE %s"
+
+        result = await self.db.fetch(query, f"%{key}%")
+        result = [i["school_full_name"] for i in result]
+
+        return result
