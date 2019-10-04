@@ -22,9 +22,6 @@ class ErrorCodes:
     signup_already_requested = 1302
     invalid_verification_key = 1303
 
-    def __getattribute__(self, attribute):
-        return attribute
-
 
 class ErrorDescriptions:
     # specific error description
@@ -49,9 +46,6 @@ class ErrorDescriptions:
     ERR_USER_ALREADY_EXISTS = "Email is in use."
     ERR_SIGNUP_ALREADY_REQUESTED = "Signup verification email already sent"
     ERR_INVALID_VERIFICATION_KEY = "Invalid or expired verification key"
-
-    def __getattribute__(self, attribute):
-        return attribute
 
 
 error_codes = ErrorCodes()
