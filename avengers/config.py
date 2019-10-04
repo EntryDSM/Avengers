@@ -50,8 +50,8 @@ class VaultClient:
                 f"service-secret/{RUN_ENV}/{SERVICE_NAME}"
             )["data"]
             return data[item]
-        except KeyError as e:
-            raise Exception(f"requested key {item} is can't be fetched")
+        except (KeyError, TypeError):
+            raise Exception(f"request on: service-secret/{RUN_ENV}/{SERVICE_NAME} \nrequested key {item} is can't be fetched")
         except Exception as e:
             raise e
 

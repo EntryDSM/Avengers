@@ -7,6 +7,7 @@ FROM base AS build
 
 ENV GITHUB_TOKEN $GITHUB_TOKEN
 ENV RUN_ENV $RUN_ENV
+ENV SERVICE_NAME avengers
 
 RUN apt-get update && \
     apt-get install -y \
