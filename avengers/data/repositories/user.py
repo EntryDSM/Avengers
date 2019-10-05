@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from dacite import from_dict
 from pypika import Parameter, Query, Table
 
@@ -39,15 +41,15 @@ class UserRepository(MySqlRepository):
 
         return from_dict(data_class=UserModel, data=data)
 
-    async def upsert(self, new_data: UserModel) -> None:
-        try:
-            past_data = await self.get(new_data.email)
-        except DataNotFoundError:
-            pass
-        else:
-            await self.delete(past_data.email)
-        finally:
-            await self.insert(new_data)
+    async def update(self, email: str, target: Dict[str, Any]):
+        query = Query.update(USER_TBL).where(
+            USER_TBL.applicant_email == Parameter("%s")
+        )
+
+        for col in target:
+            query = query.set(col, target[col])
+
+        await self.db.execute(query.get_sql(quote_char=None), email)
 
     async def insert(self, user: UserModel):
         query: str = Query.into(UserModel).insert(
@@ -67,10 +69,3 @@ class UserRepository(MySqlRepository):
         ).get_sql(quote_char=None)
 
         await self.db.execute(query)
-
-    async def delete(self, email: str) -> None:
-        query: str = Query.from_(USER_TBL).delete().where(
-            USER_TBL.email == Parameter("%s")
-        ).get_sql(quote_char=None)
-
-        await self.db.execute(query, email)
