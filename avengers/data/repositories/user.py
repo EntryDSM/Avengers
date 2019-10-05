@@ -1,9 +1,12 @@
+from dataclasses import asdict
+from datetime import timedelta
+
 from dacite import from_dict
 from pypika import Parameter, Query, Table
 
 from avengers.data.exc import DataNotFoundError
-from avengers.data.models.user import UserModel
-from avengers.data.repositories import MySqlRepository
+from avengers.data.models.user import PreUserModel, UserModel
+from avengers.data.repositories import MySqlRepository, RedisRepository
 
 USER_TBL = Table('user')
 
@@ -50,10 +53,16 @@ class UserRepository(MySqlRepository):
             await self.insert(new_data)
 
     async def insert(self, user: UserModel):
-        query: str = Query.into(UserModel).insert(
+        receipt_code = user.receipt_code
+
+        if not receipt_code:
+            query = "SELECT count(*) as count FROM user;"
+            receipt_code = (await self.db.fetchone(query))["count"] + 1
+
+        query: str = Query.into(USER_TBL).insert(
             user.email,
             user.password,
-            user.receipt_code,
+            receipt_code,
             user.is_paid,
             user.is_printed_application_arrived,
             user.is_passed_first_apply,
@@ -74,3 +83,25 @@ class UserRepository(MySqlRepository):
         ).get_sql(quote_char=None)
 
         await self.db.execute(query, email)
+
+
+class PreUserRepository(RedisRepository):
+    key_template = "avengers:verification:{0}"
+
+    async def set(self, pre_user: PreUserModel, verification_key: str):
+        await self.db.multiset(
+            {
+                self.key_template.format(verification_key): asdict(pre_user),
+                self.key_template.format(pre_user.email): asdict(pre_user),
+            },
+            expire_time=timedelta(minutes=3).seconds,
+        )
+
+    async def get(self, key: str) -> PreUserModel:
+        result = await self.db.get(self.key_template.format(key))
+
+        if result:
+            return from_dict(data_class=PreUserModel, data=result)
+
+    async def confirm(self, verification_key: str):
+        await self.db.delete(verification_key)
