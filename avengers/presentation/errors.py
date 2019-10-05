@@ -5,6 +5,7 @@ class ErrorCodes:
     # code 10xx server error
     redis_error = 1002
     mysql_error = 1003
+    sendgrid_error = 1004
 
     # code 11xx application validation error
     validation_error = 1100
