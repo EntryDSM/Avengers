@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, Tuple
 
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.ged_application import GedApplicationModel
@@ -28,10 +28,10 @@ class ApplicationService:
     graduated_repo = GraduatedApplicationRepository()
     ungraduated_repo = UnGraduatedApplicationRepository()
 
-    async def get(self, email: str) -> ApplicationUnion:
-        ged = await _get_optional_data(email, self.ged_repo)
-        graduated = await _get_optional_data(email, self.graduated_repo)
-        ungraduated = await _get_optional_data(email, self.ungraduated_repo)
+    async def get(self, email: str) -> Tuple[ApplicationUnion, str]:
+        ged = await _get_optional_data(email, self.ged_repo), "GED"
+        graduated = await _get_optional_data(email, self.graduated_repo), "GRADUATED"
+        ungraduated = await _get_optional_data(email, self.ungraduated_repo), "UNGRADUATED"
 
         res = ged or graduated or ungraduated
         if not res:
