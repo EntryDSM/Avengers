@@ -13,4 +13,3 @@ class SignUpRequestSchema(Schema):
 
 class LoginRequestSchema(SignUpRequestSchema):
     """Login Schema"""
-

@@ -3,7 +3,7 @@ from pypika import Parameter, Query, Table
 
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.graduated_application import (
-    GraduatedApplicationModelBase,
+    GraduatedApplicationModel,
 )
 from avengers.data.repositories import MySqlRepository
 
@@ -11,7 +11,7 @@ GRADUATED_APPLICATION_TBL = Table('graduated_application')
 
 
 class GraduatedApplicationRepository(MySqlRepository):
-    async def get(self, email: str) -> GraduatedApplicationModelBase:
+    async def get(self, email: str) -> GraduatedApplicationModel:
         query: str = Query.from_(GRADUATED_APPLICATION_TBL).select(
             GRADUATED_APPLICATION_TBL.user_email,
             GRADUATED_APPLICATION_TBL.apply_type,
@@ -48,11 +48,11 @@ class GraduatedApplicationRepository(MySqlRepository):
         )
 
         return from_dict(
-            data_class=GraduatedApplicationModelBase,
+            data_class=GraduatedApplicationModel,
             data=await self.db.fetchone(query, email),
         )
 
-    async def upsert(self, new_data: GraduatedApplicationModelBase) -> None:
+    async def upsert(self, new_data: GraduatedApplicationModel) -> None:
         try:
             past_data = await self.get(new_data.user_email)
         except DataNotFoundError:
@@ -62,7 +62,7 @@ class GraduatedApplicationRepository(MySqlRepository):
         finally:
             await self.insert(new_data)
 
-    async def insert(self, data: GraduatedApplicationModelBase):
+    async def insert(self, data: GraduatedApplicationModel):
         query: str = Query.into(GRADUATED_APPLICATION_TBL).insert(
             data.user_email,
             data.apply_type,

@@ -29,12 +29,12 @@ class BaseCommonApplication(BaseApplication):
     period_cut_count: Optional[int]
     late_count: Optional[int]
     early_leave_count: Optional[int]
-    korean: Optional[str]  # ~~validation needed~~
+    korean: Optional[str]
     social: Optional[str]
     history: Optional[str]
     math: Optional[str]
     science: Optional[str]
     tech_and_home: Optional[str]
-    english: Optional[str]  # ~~validation needed~~
+    english: Optional[str]
     self_introduction: Optional[str]
     study_plan: Optional[str]

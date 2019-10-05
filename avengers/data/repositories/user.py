@@ -37,10 +37,7 @@ class UserRepository(MySqlRepository):
         ]:
             data[i] = bool([i])
 
-        return from_dict(
-            data_class=UserModel,
-            data=data,
-        )
+        return from_dict(data_class=UserModel, data=data)
 
     async def upsert(self, new_data: UserModel) -> None:
         try:
