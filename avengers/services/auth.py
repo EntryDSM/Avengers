@@ -2,22 +2,24 @@ import secrets
 from dataclasses import asdict
 
 from dacite import from_dict
-from werkzeug.security import generate_password_hash
+from sanic_jwt_extended import create_access_token, create_refresh_token
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from avengers.config import settings
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.user import PreUserModel, UserModel
 from avengers.data.repositories.email_sender import EmailSenderRepository
-from avengers.data.repositories.user import PreUserRepository, UserRepository
+from avengers.data.repositories.user import PreUserRepository, UserRepository, UserTokenRepository
 from avengers.presentation.exceptions import (
     SignupAlreadyRequested,
     UserAlreadyExists,
-    InvalidVerificationKey)
+    InvalidVerificationKey, UserNotFound, TokenError)
 
 
 class AuthService:
     preuser_repo = PreUserRepository()
     user_repo = UserRepository()
+    token_repo = UserTokenRepository()
     email_sender = EmailSenderRepository()
 
     async def signup(self, pre_user: PreUserModel):
@@ -55,3 +57,26 @@ class AuthService:
         )
 
         await self.user_repo.insert(user)
+
+    async def login(self, email, password, app):
+        user = await self.user_repo.get(email)
+
+        if not user or not check_password_hash(user.password, password):
+            raise UserNotFound
+
+        access_token = await create_access_token(app, email)
+        refresh_token = await create_refresh_token(app, email)
+
+        await self.token_repo.set(email, refresh_token)
+
+        return access_token, refresh_token
+
+    async def refresh(self, token: str, app):
+        email = await self.token_repo.get(token)
+        if not email:
+            raise TokenError
+
+        return await create_access_token(app, email)
+
+    async def logout(self, token: str):
+        await self.token_repo.delete(token)

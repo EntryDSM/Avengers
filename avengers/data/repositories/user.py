@@ -4,6 +4,7 @@ from datetime import timedelta
 from dacite import from_dict
 from pypika import Parameter, Query, Table
 
+from avengers.config import settings
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.user import PreUserModel, UserModel
 from avengers.data.repositories import MySqlRepository, RedisRepository
@@ -107,3 +108,26 @@ class PreUserRepository(RedisRepository):
         pair = await self.db.get(self.key_template.format(verification_key))
 
         await self.db.delete(self.key_template.format(verification_key), self.key_template.format(pair["email"]))
+
+
+class UserTokenRepository(RedisRepository):
+    key_template = "avengers:refresh:{}"
+
+    async def set(self, email: str, token: str):
+        await self.delete(email)
+
+        await self.db.multiset({
+            self.key_template.format(email): token,
+            self.key_template.format(token): email,
+        }, settings.JWT_REFRESH_EXPIRES)
+
+    async def get(self, key: str):
+        return await self.db.get(self.key_template.format(key))
+
+    async def delete(self, email):
+        pair = await self.get(email)
+
+        await self.db.delete(
+            self.key_template.format(email),
+            self.key_template.format(pair)
+        )
