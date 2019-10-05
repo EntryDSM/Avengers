@@ -26,8 +26,20 @@ class UserRepository(MySqlRepository):
             USER_TBL.final_score,
         ).where(USER_TBL.email == Parameter("%s")).get_sql(quote_char=None)
 
+        data = await self.db.fetchone(query, True, email)
+
+        for i in [
+            "is_paid",
+            "is_printed_application_arrived",
+            "is_passed_first_apply",
+            "is_passed_interview",
+            "is_final_submit",
+        ]:
+            data[i] = bool([i])
+
         return from_dict(
-            data_class=UserModel, data=await self.db.fetchone(query, email)
+            data_class=UserModel,
+            data=data,
         )
 
     async def upsert(self, new_data: UserModel) -> None:
