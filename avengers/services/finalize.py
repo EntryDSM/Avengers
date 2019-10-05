@@ -108,11 +108,15 @@ async def _process_applicant_grades(application: BaseCommonApplication):
     if is_first_grade_empty and is_second_grade_empty:
         first_grade_score = second_grade_score = third_grade_score
     elif is_first_grade_empty and not is_second_grade_empty:
-        first_grade_score = (sum(second_grade_li) + third_grade_score) * 0.5
+        first_grade_score = (
+            sum(second_grade_li) + third_grade_score
+        ) * decimal.Decimal('0.5')
         second_grade_score = sum(second_grade_li)
     elif not is_first_grade_empty and is_second_grade_empty:
         first_grade_score = sum(first_grade_li)
-        second_grade_score = (sum(first_grade_li) + third_grade_score) * 0.5
+        second_grade_score = (
+            sum(first_grade_li) + third_grade_score
+        ) * decimal.Decimal('0.5')
     else:
         first_grade_score = sum(
             [s for s in first_grade_li if isinstance(s, int)]
@@ -121,18 +125,17 @@ async def _process_applicant_grades(application: BaseCommonApplication):
             [s for s in second_grade_li if isinstance(s, int)]
         )
 
+    multiple12 = decimal.Decimal('2.7')
+    multiple3 = decimal.Decimal('3.6')
+
     if application.apply_type == 'COMMON':
-        conversion_score = (
-            4.5 * first_grade_score
-            + 4.5 * second_grade_score
-            + 6 * third_grade_score
-        )
-    else:
-        conversion_score = (
-            2.7 * first_grade_score
-            + 2.7 * second_grade_score
-            + 3.6 * third_grade_score
-        )
+        multiple12 = decimal.Decimal('4.5')
+        multiple3 = 6
+
+    conversion_score = (
+        multiple12 * (first_grade_score + second_grade_score)
+        + multiple3 * third_grade_score
+    )
 
     return {
         "volunteer_score": volunteer_score,
