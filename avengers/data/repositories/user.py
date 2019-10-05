@@ -104,4 +104,6 @@ class PreUserRepository(RedisRepository):
             return from_dict(data_class=PreUserModel, data=result)
 
     async def confirm(self, verification_key: str):
-        await self.db.delete(verification_key)
+        pair = await self.db.get(self.key_template.format(verification_key))
+
+        await self.db.delete(self.key_template.format(verification_key), self.key_template.format(pair["email"]))
