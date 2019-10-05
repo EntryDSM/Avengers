@@ -1,11 +1,11 @@
 from dataclasses import asdict
 from datetime import timedelta
+from typing import Any, Dict
 
 from dacite import from_dict
 from pypika import Parameter, Query, Table
 
 from avengers.config import settings
-from avengers.data.exc import DataNotFoundError
 from avengers.data.models.user import PreUserModel, UserModel
 from avengers.data.repositories import MySqlRepository, RedisRepository
 
@@ -43,15 +43,15 @@ class UserRepository(MySqlRepository):
 
         return from_dict(data_class=UserModel, data=data)
 
-    async def upsert(self, new_data: UserModel) -> None:
-        try:
-            past_data = await self.get(new_data.email)
-        except DataNotFoundError:
-            pass
-        else:
-            await self.delete(past_data.email)
-        finally:
-            await self.insert(new_data)
+    async def update(self, email: str, target: Dict[str, Any]):
+        query = Query.update(USER_TBL).where(
+            USER_TBL.applicant_email == Parameter("%s")
+        )
+
+        for col in target:
+            query = query.set(col, target[col])
+
+        await self.db.execute(query.get_sql(quote_char=None), email)
 
     async def insert(self, user: UserModel):
         receipt_code = user.receipt_code
