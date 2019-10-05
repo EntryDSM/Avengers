@@ -10,7 +10,9 @@ create table if not exists school
     school_name      varchar(50)  not null,
     school_full_name varchar(100) null,
     education_office varchar(50)  null
-);
+)
+    collate = utf8mb4_unicode_ci;
+
 
 create table if not exists user
 (
