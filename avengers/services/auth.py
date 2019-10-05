@@ -3,17 +3,24 @@ from dataclasses import asdict
 
 from dacite import from_dict
 from sanic_jwt_extended import create_access_token, create_refresh_token
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from avengers.config import settings
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.user import PreUserModel, UserModel
 from avengers.data.repositories.email_sender import EmailSenderRepository
-from avengers.data.repositories.user import PreUserRepository, UserRepository, UserTokenRepository
+from avengers.data.repositories.user import (
+    PreUserRepository,
+    UserRepository,
+    UserTokenRepository,
+)
 from avengers.presentation.exceptions import (
+    InvalidVerificationKey,
     SignupAlreadyRequested,
+    TokenError,
     UserAlreadyExists,
-    InvalidVerificationKey, UserNotFound, TokenError)
+    UserNotFound,
+)
 
 
 class AuthService:
@@ -51,10 +58,7 @@ class AuthService:
 
         await self.preuser_repo.confirm(verification_key)
 
-        user = from_dict(
-            data_class=UserModel,
-            data={**asdict(pre_user)}
-        )
+        user = from_dict(data_class=UserModel, data={**asdict(pre_user)})
 
         await self.user_repo.insert(user)
 

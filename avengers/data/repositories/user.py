@@ -107,7 +107,10 @@ class PreUserRepository(RedisRepository):
     async def confirm(self, verification_key: str):
         pair = await self.db.get(self.key_template.format(verification_key))
 
-        await self.db.delete(self.key_template.format(verification_key), self.key_template.format(pair["email"]))
+        await self.db.delete(
+            self.key_template.format(verification_key),
+            self.key_template.format(pair["email"]),
+        )
 
 
 class UserTokenRepository(RedisRepository):
@@ -116,10 +119,13 @@ class UserTokenRepository(RedisRepository):
     async def set(self, email: str, token: str):
         await self.delete(email)
 
-        await self.db.multiset({
-            self.key_template.format(email): token,
-            self.key_template.format(token): email,
-        }, settings.JWT_REFRESH_EXPIRES)
+        await self.db.multiset(
+            {
+                self.key_template.format(email): token,
+                self.key_template.format(token): email,
+            },
+            settings.JWT_REFRESH_EXPIRES,
+        )
 
     async def get(self, key: str):
         return await self.db.get(self.key_template.format(key))
@@ -128,6 +134,5 @@ class UserTokenRepository(RedisRepository):
         pair = await self.get(email)
 
         await self.db.delete(
-            self.key_template.format(email),
-            self.key_template.format(pair)
+            self.key_template.format(email), self.key_template.format(pair)
         )

@@ -3,21 +3,35 @@ from sanic.exceptions import NotFound
 from sanic.request import Request
 from sanic.response import json
 from sanic.views import HTTPMethodView
-from sanic_jwt_extended import create_access_token, create_refresh_token, jwt_refresh_token_required
+from sanic_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_refresh_token_required,
+    jwt_required,
+)
 from sanic_jwt_extended.tokens import Token
 
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.user import PreUserModel
-from avengers.presentation.exceptions import InvalidSignupInfo, InvalidVerificationKey, UserNotFound, TokenError
+from avengers.presentation.exceptions import (
+    InvalidSignupInfo,
+    InvalidVerificationKey,
+    TokenError,
+    UserNotFound,
+)
+from avengers.presentation.schema.auth import (
+    LoginRequestSchema,
+    SignUpRequestSchema,
+)
 from avengers.services.auth import AuthService
 from avengers.services.mypage import MyPageService
 from avengers.services.school_search import SchoolSearchService
-from avengers.presentation.schema.auth import SignUpRequestSchema, LoginRequestSchema
 
 
 class SchoolSearchView(HTTPMethodView):
     service = SchoolSearchService()
 
+    @jwt_required
     async def get(self, request: Request):
         key = request.args.get("query")
 
@@ -28,12 +42,10 @@ class SchoolSearchView(HTTPMethodView):
 class MyPageView(HTTPMethodView):
     service = MyPageService()
 
-    # @jwt_required
-    async def get(self, request: Request):
-        _ = "kshr2d2@gmail.com"  # FIXME
-
+    @jwt_required
+    async def get(self, request: Request, token: Token):
         try:
-            result = await self.service.retrieve_status(_)
+            result = await self.service.retrieve_status(token.jwt_identity)
             return json(body=result, status=200)
         except DataNotFoundError:
             raise NotFound("User not found")
@@ -90,7 +102,9 @@ class AuthView(HTTPMethodView):
         except ValidationError:
             raise UserNotFound
 
-        access_token, refresh_token = await self.service.login(**login, app=request.app)
+        access_token, refresh_token = await self.service.login(
+            **login, app=request.app
+        )
 
         return json({'access': access_token, 'refresh': refresh_token}, 201)
 
@@ -113,4 +127,3 @@ class AuthView(HTTPMethodView):
         await self.service.logout(token)
 
         return json({}, status=204)
-

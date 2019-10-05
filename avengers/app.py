@@ -30,8 +30,12 @@ def create_app():
     add_error_handlers(app)
 
     app.config["JWT_SECRET_KEY"] = settings.JWT_SECRET_KEY
-    app.config["JWT_ACCESS_EXPIRES"] = timedelta(seconds=settings.JWT_ACCESS_EXPIRES)
-    app.config["JWT_REFRESH_EXPIRES"] = timedelta(seconds=settings.JWT_REFRESH_EXPIRES)
+    app.config["JWT_ACCESS_EXPIRES"] = timedelta(
+        seconds=settings.JWT_ACCESS_EXPIRES
+    )
+    app.config["JWT_REFRESH_EXPIRES"] = timedelta(
+        seconds=settings.JWT_REFRESH_EXPIRES
+    )
     JWTManager(app)
 
     @app.route("/")
