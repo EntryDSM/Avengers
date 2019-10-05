@@ -24,6 +24,12 @@ class MySQLOperationError(AvengersException):
     description = descriptions.ERR_DATABASE
 
 
+@add_status_code(503)
+class SendgridError(AvengersException):
+    error_code = error_codes.sendgrid_error
+    descriptions = descriptions.ERR_DATABASE
+
+
 @add_status_code(400)
 class InvalidApplication(AvengersException):
     error_code = error_codes.validation_error
