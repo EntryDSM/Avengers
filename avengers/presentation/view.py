@@ -1,7 +1,10 @@
+import os
+
+import aiofiles
 from marshmallow import ValidationError
 from sanic.exceptions import NotFound
 from sanic.request import Request
-from sanic.response import json
+from sanic.response import json, file
 from sanic.views import HTTPMethodView
 from sanic_jwt_extended import (
     create_access_token,
@@ -11,6 +14,7 @@ from sanic_jwt_extended import (
 )
 from sanic_jwt_extended.tokens import Token
 
+from avengers.config import PICTURE_DIR
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.user import PreUserModel
 from avengers.presentation.exceptions import (
@@ -18,7 +22,7 @@ from avengers.presentation.exceptions import (
     InvalidVerificationKey,
     TokenError,
     UserNotFound,
-)
+    WrongImageData)
 from avengers.presentation.schema.auth import (
     LoginRequestSchema,
     SignUpRequestSchema,
@@ -127,3 +131,30 @@ class AuthView(HTTPMethodView):
         await self.service.logout(token)
 
         return json({}, status=204)
+
+
+class PhotoView(HTTPMethodView):
+    @jwt_required
+    async def put(self, request: Request, token: Token):
+        if not os.path.exists(PICTURE_DIR):
+            os.makedirs(PICTURE_DIR)
+
+        file = request.files.get('image')
+
+        if not file:
+            raise WrongImageData
+
+        ext = file.name.split(".")[-1]
+        if ext not in ["png", "jpeg", "jpg", 'jp2', 'j2c']:
+            raise WrongImageData
+
+        filename = f"{token.jwt_identity}"
+
+        async with aiofiles.open(f"{PICTURE_DIR}/{filename}", 'wb') as f:
+            await f.write(file.body)
+
+        return json({}, status=204)
+
+    @jwt_required
+    async def get(self, request: Request, token: Token):
+        return await file(f"{PICTURE_DIR}/{token.jwt_identity}", status=200, mime_type="image/*")

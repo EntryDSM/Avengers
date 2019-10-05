@@ -53,6 +53,12 @@ class ApplicationNotFound(AvengersException):
     descriptions = descriptions.ERR_ANY_APPLICATION_SUBMITTED_YET
 
 
+@add_status_code(404)
+class WrongImageData(AvengersException):
+    error_code = error_codes.validation_error
+    description = descriptions.ERR_WRONG_IMAGE_DATA
+
+
 @add_status_code(403)
 class UserNotFound(AvengersException):
     error_code = error_codes.user_not_found
