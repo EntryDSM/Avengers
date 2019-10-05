@@ -13,4 +13,3 @@ class SchoolSearchView(HTTPMethodView):
 
         result = await self.service.search(key)
         return json(result, status=200)
-

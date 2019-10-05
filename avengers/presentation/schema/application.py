@@ -1,7 +1,9 @@
 import decimal
 
 from marshmallow import Schema, validate
-from marshmallow.fields import String, Boolean, Decimal, Integer, List as ListField, Nested
+from marshmallow.fields import Boolean, Decimal, Integer
+from marshmallow.fields import List as ListField
+from marshmallow.fields import Nested, String
 
 from avengers.presentation.schema.common import Date
 
@@ -80,9 +82,13 @@ class PersonalInformationWithCurrentSchoolInfo(Schema):
     )
 
 
-class PersonalInformationWitGraduatedSchoolInfo(PersonalInformationWithCurrentSchoolInfo):
+class PersonalInformationWitGraduatedSchoolInfo(
+    PersonalInformationWithCurrentSchoolInfo
+):
     graduated_year = String(
-        required=True, allow_none=True, validate=[validate.Regexp(r"^\d{4}$"), validate.Length(equal=4)]
+        required=True,
+        allow_none=True,
+        validate=[validate.Regexp(r"^\d{4}$"), validate.Length(equal=4)],
     )
 
 
@@ -272,7 +278,9 @@ class GEDApplicationRequestSchema(Schema):
 class GraduatedApplicationRequestSchema(Schema):
     classification = Nested(Classification, required=True, allow_none=False)
     personal_information = Nested(
-        PersonalInformationWitGraduatedSchoolInfo, required=True, allow_none=False
+        PersonalInformationWitGraduatedSchoolInfo,
+        required=True,
+        allow_none=False,
     )
     diligence_grade = Nested(DiligenceGrade, required=True, allow_none=False)
     school_grade = Nested(
@@ -285,7 +293,9 @@ class GraduatedApplicationRequestSchema(Schema):
 
 class UngraduatedApplicationRequestSchema(GraduatedApplicationRequestSchema):
     personal_information = Nested(
-        PersonalInformationWithCurrentSchoolInfo, required=True, allow_none=False
+        PersonalInformationWithCurrentSchoolInfo,
+        required=True,
+        allow_none=False,
     )
     school_grade = Nested(
         UngraduatedSchoolGrade, required=True, allow_none=False

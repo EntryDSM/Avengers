@@ -4,5 +4,5 @@ from avengers.data.models import BaseCommonApplication
 
 
 @dataclass(frozen=True)
-class UngraduatedApplicationModelBase(BaseCommonApplication):
+class UngraduatedApplicationModel(BaseCommonApplication):
     """Grades include up to 3-1(semester 5)"""

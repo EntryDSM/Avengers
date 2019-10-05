@@ -2,16 +2,16 @@ from dacite import from_dict
 from pypika import Parameter, Query, Table
 
 from avengers.data.exc import DataNotFoundError
-from avengers.data.models.graduated_application import (
-    GraduatedApplicationModelBase,
+from avengers.data.models.ungraduated_application import (
+    UngraduatedApplicationModel,
 )
 from avengers.data.repositories import MySqlRepository
 
 UNGRADUATED_APPLICATION_TBL = Table('graduated_application')
 
 
-class GraduatedApplicationRepository(MySqlRepository):
-    async def get(self, email: str) -> GraduatedApplicationModelBase:
+class UnGraduatedApplicationRepository(MySqlRepository):
+    async def get(self, email: str) -> UngraduatedApplicationModel:
         query: str = Query.from_(UNGRADUATED_APPLICATION_TBL).select(
             UNGRADUATED_APPLICATION_TBL.user_email,
             UNGRADUATED_APPLICATION_TBL.apply_type,
@@ -47,11 +47,11 @@ class GraduatedApplicationRepository(MySqlRepository):
         )
 
         return from_dict(
-            data_class=GraduatedApplicationModelBase,
+            data_class=UngraduatedApplicationModel,
             data=await self.db.fetchone(query, email),
         )
 
-    async def upsert(self, new_data: GraduatedApplicationModelBase) -> None:
+    async def upsert(self, new_data: UngraduatedApplicationModel) -> None:
         try:
             past_data = await self.get(new_data.user_email)
         except DataNotFoundError:
@@ -61,7 +61,7 @@ class GraduatedApplicationRepository(MySqlRepository):
         finally:
             await self.insert(new_data)
 
-    async def insert(self, data: GraduatedApplicationModelBase):
+    async def insert(self, data: UngraduatedApplicationModel):
         query: str = Query.into(UNGRADUATED_APPLICATION_TBL).insert(
             data.user_email,
             data.apply_type,
