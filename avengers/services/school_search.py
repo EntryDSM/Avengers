@@ -15,4 +15,3 @@ class SchoolSearchService:
         result = await self.repo.search(key)
 
         return result
-
