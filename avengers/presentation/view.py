@@ -26,7 +26,7 @@ from avengers.presentation.exceptions import (
     TokenError,
     UserNotFound,
     WrongImageData,
-    InvalidApplication)
+    InvalidApplication, ImageNotFound)
 from avengers.presentation.schema.auth import (
     LoginRequestSchema,
     SignUpRequestSchema,
@@ -177,6 +177,9 @@ class PhotoView(HTTPMethodView):
 
     @jwt_required
     async def get(self, request: Request, token: Token):
+        if not os.path.exists(f"{PICTURE_DIR}/{token.jwt_identity}"):
+            raise ImageNotFound
+
         return await file(
             f"{PICTURE_DIR}/{token.jwt_identity}",
             status=200,

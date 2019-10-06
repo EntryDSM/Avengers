@@ -59,6 +59,12 @@ class WrongImageData(AvengersException):
     description = descriptions.ERR_WRONG_IMAGE_DATA
 
 
+@add_status_code(404)
+class ImageNotFound(AvengersException):
+    error_code = error_codes.validation_error
+    description = descriptions.ERR_IMAGE_NOT_FOUND
+
+
 @add_status_code(403)
 class UserNotFound(AvengersException):
     error_code = error_codes.user_not_found
