@@ -60,7 +60,7 @@ class SchoolSearchView(HTTPMethodView):
     service = SchoolSearchService()
 
     @jwt_required
-    async def get(self, request: Request):
+    async def get(self, request: Request, token: Token):
         key = request.args.get("query")
 
         result = await self.service.search(key)
