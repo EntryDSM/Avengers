@@ -5,7 +5,7 @@ from dacite import from_dict
 from sanic_jwt_extended import create_access_token, create_refresh_token
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from avengers.config import settings
+from avengers.config import settings, SIGNUP_EMAIL_TEMPLATE_A, SIGNUP_EMAIL_TEMPLATE_B
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.user import PreUserModel, UserModel
 from avengers.data.repositories.email_sender import EmailSenderRepository
@@ -47,7 +47,7 @@ class AuthService:
         await self.email_sender.send_mail(
             pre_user.email,
             title=settings.SIGNUP_EMAIL_TITLE,
-            content=settings.SIGNUP_EMAIL_CONTENT.format(key),
+            content=SIGNUP_EMAIL_TEMPLATE_A + key + SIGNUP_EMAIL_TEMPLATE_B,
         )
 
     async def confirm(self, verification_key: str):
@@ -63,9 +63,12 @@ class AuthService:
         await self.user_repo.insert(user)
 
     async def login(self, email, password, app):
-        user = await self.user_repo.get(email)
+        try:
+            user = await self.user_repo.get(email)
+        except DataNotFoundError:
+            raise UserNotFound
 
-        if not user or not check_password_hash(user.password, password):
+        if not check_password_hash(user.password, password):
             raise UserNotFound
 
         access_token = await create_access_token(app, email)
