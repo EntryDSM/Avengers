@@ -10,9 +10,6 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 
 RUN_ENV = os.environ.get("RUN_ENV")
 
-PICTURE_DIR = os.path.dirname(__file__).replace("/avengers", "") + '/pics'
-
-
 LOGO = """
 ──────────────▐█████───────
 ──────▄▄████████████▄──────

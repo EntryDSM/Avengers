@@ -27,7 +27,7 @@ class GraduatedApplicationRepository(MySqlRepository):
             GRADUATED_APPLICATION_TBL.post_code,
             GRADUATED_APPLICATION_TBL.student_number,
             GRADUATED_APPLICATION_TBL.graduated_year,
-            GRADUATED_APPLICATION_TBL.school_name,
+            GRADUATED_APPLICATION_TBL.school_code,
             GRADUATED_APPLICATION_TBL.school_tel,
             GRADUATED_APPLICATION_TBL.volunteer_time,
             GRADUATED_APPLICATION_TBL.full_cut_count,
@@ -43,16 +43,13 @@ class GraduatedApplicationRepository(MySqlRepository):
             GRADUATED_APPLICATION_TBL.english,
             GRADUATED_APPLICATION_TBL.self_introduction,
             GRADUATED_APPLICATION_TBL.study_plan,
-        ).where(GRADUATED_APPLICATION_TBL.user_email == Parameter("%s")).get_sql(
+        ).where(GRADUATED_APPLICATION_TBL.email == Parameter("%s")).get_sql(
             quote_char=None
         )
 
-        data = await self.db.fetchone(query, True, email)
-        data["is_daejeon"] = bool(data["is_daejeon"])
-
         return from_dict(
             data_class=GraduatedApplicationModel,
-            data=data,
+            data=await self.db.fetchone(query, email),
         )
 
     async def upsert(self, new_data: GraduatedApplicationModel) -> None:
@@ -66,7 +63,6 @@ class GraduatedApplicationRepository(MySqlRepository):
             await self.insert(new_data)
 
     async def insert(self, data: GraduatedApplicationModel):
-        print(data)
         query: str = Query.into(GRADUATED_APPLICATION_TBL).insert(
             data.user_email,
             data.apply_type,
@@ -82,7 +78,7 @@ class GraduatedApplicationRepository(MySqlRepository):
             data.post_code,
             data.student_number,
             data.graduated_year,
-            data.school_name,
+            data.school_code,
             data.school_tel,
             data.volunteer_time,
             data.full_cut_count,
@@ -99,12 +95,12 @@ class GraduatedApplicationRepository(MySqlRepository):
             data.self_introduction,
             data.study_plan,
         ).get_sql(quote_char=None)
-        print(query)
+
         await self.db.execute(query)
 
     async def delete(self, email: str):
         query: str = Query.from_(GRADUATED_APPLICATION_TBL).delete().where(
-            GRADUATED_APPLICATION_TBL.user_email == Parameter("%s")
+            GRADUATED_APPLICATION_TBL.email == Parameter("%s")
         ).get_sql(quote_char=None)
 
         await self.db.execute(query, email)

@@ -1,4 +1,4 @@
-from typing import Optional, Union, Tuple
+from typing import Optional, Union
 
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.ged_application import GedApplicationModel

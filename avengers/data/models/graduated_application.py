@@ -6,4 +6,6 @@ from avengers.data.models import BaseCommonApplication
 
 @dataclass(frozen=True)
 class GraduatedApplicationModel(BaseCommonApplication):
-    graduated_year: Optional[str]
+    """Grades include up to 3-2(semester 6)"""
+
+    graduated_year = Optional[str]
