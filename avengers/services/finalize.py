@@ -62,13 +62,17 @@ async def _process_ged_grades(application: GedApplicationModel):
     avg_score = application.ged_average_score
     max_conversion_score = 90
 
-    volunteer_score = decimal.Decimal((avg_score - 40) / 60 * 12 + 3, 3).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
+    volunteer_score = decimal.Decimal(
+        (avg_score - 40) / 60 * 12 + 3, 3
+    ).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
     attendance_score = 15
 
     if application.apply_type == 'COMMON':
         max_conversion_score = 150
 
-    conversion_score = decimal.Decimal((avg_score - 50) / 50 * max_conversion_score).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
+    conversion_score = decimal.Decimal(
+        (avg_score - 50) / 50 * max_conversion_score
+    ).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
 
     return {
         "volunteer_score": volunteer_score,
@@ -192,7 +196,9 @@ def _calculate_volunteer_score(volunteer_time: int) -> decimal.Decimal:
     if volunteer_time >= 50:
         volunteer_score = decimal.Decimal('15')
     elif 49 >= volunteer_time >= 15:
-        volunteer_score = decimal.Decimal(decimal.Decimal(str(volunteer_time - 14)) / 36 * 12 + 3).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
+        volunteer_score = decimal.Decimal(
+            decimal.Decimal(str(volunteer_time - 14)) / 36 * 12 + 3
+        ).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
     else:
         volunteer_score = decimal.Decimal('3')
 
