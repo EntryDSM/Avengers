@@ -2,8 +2,6 @@ import decimal
 import os
 from dataclasses import asdict
 
-import aiofiles
-
 from avengers import config
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models import BaseCommonApplication
@@ -47,8 +45,8 @@ class FinalizeApplicationService:
         except DataNotFoundError:
             raise FinalValidationFailed
 
-        # if not os.path.exists(f"{config.PICTURE_DIR}/{email}"):
-        #     raise FinalValidationFailed
+        if not os.path.exists(f"{config.PICTURE_DIR}/{email}"):
+            raise FinalValidationFailed
 
         if isinstance(application, GedApplicationModel):
             grades = await _process_ged_grades(application)
@@ -56,7 +54,7 @@ class FinalizeApplicationService:
             grades = await _process_applicant_grades(application)
 
         await self.user_repo.update(
-            user.email, {**grades, 'is_final_submit': False}
+            user.email, {**grades, 'is_final_submit': True}
         )
 
 
@@ -64,15 +62,13 @@ async def _process_ged_grades(application: GedApplicationModel):
     avg_score = application.ged_average_score
     max_conversion_score = 90
 
-    # 반올림 셋째자리
-    volunteer_score = round((avg_score - 40) / 60 * 12 + 3, 3)
+    volunteer_score = decimal.Decimal((avg_score - 40) / 60 * 12 + 3, 3).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
     attendance_score = 15
 
     if application.apply_type == 'COMMON':
         max_conversion_score = 150
 
-    # 반올림 셋째자리
-    conversion_score = round((avg_score - 50) / 50 * max_conversion_score, 3)
+    conversion_score = decimal.Decimal((avg_score - 50) / 50 * max_conversion_score).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
 
     return {
         "volunteer_score": volunteer_score,
@@ -161,11 +157,10 @@ async def _process_applicant_grades(application: BaseCommonApplication):
         multiple12 = decimal.Decimal('4.5')
         multiple3 = 6
 
-    # 반올림 셋째자리
-    conversion_score = (
+    conversion_score = decimal.Decimal(
         multiple12 * (first_grade_score + second_grade_score)
         + multiple3 * third_grade_score
-    )
+    ).quantize(decimal.Decimal("0.001"), decimal.ROUND_HALF_UP)
 
     return {
         "volunteer_score": volunteer_score,
@@ -197,10 +192,7 @@ def _calculate_volunteer_score(volunteer_time: int) -> decimal.Decimal:
     if volunteer_time >= 50:
         volunteer_score = decimal.Decimal('15')
     elif 49 >= volunteer_time >= 15:
-        # 반올림 셋째자리
-        volunteer_score = round(
-            decimal.Decimal(str(volunteer_time - 14)) / 36 * 12 + 3, 3
-        )
+        volunteer_score = decimal.Decimal(decimal.Decimal(str(volunteer_time - 14)) / 36 * 12 + 3).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
     else:
         volunteer_score = decimal.Decimal('3')
 
