@@ -35,6 +35,14 @@ class Classification(Schema):
     is_daejeon = Boolean(required=True, allow_none=True)
 
 
+class GraduatedClassification(Classification):
+    graduated_year = String(
+        required=True,
+        allow_none=True,
+        validate=[validate.Regexp(r"^\d{4}$"), validate.Length(equal=4)],
+    )
+
+
 class PersonalInformation(Schema):
     name = String(
         required=True, allow_none=True, validate=validate.Length(min=2, max=15)
@@ -68,7 +76,7 @@ class PersonalInformation(Schema):
     )
 
 
-class PersonalInformationWithCurrentSchoolInfo(PersonalInformation):
+class PersonalInformationWithSchoolInfo(PersonalInformation):
     student_number = String(
         required=True, allow_none=True, validate=validate.Regexp(r"\d{5}")
     )
@@ -79,16 +87,6 @@ class PersonalInformationWithCurrentSchoolInfo(PersonalInformation):
         required=True,
         allow_none=True,
         validate=validate.Regexp(r"^01\d{8,9}$"),
-    )
-
-
-class PersonalInformationWitGraduatedSchoolInfo(
-    PersonalInformationWithCurrentSchoolInfo
-):
-    graduated_year = String(
-        required=True,
-        allow_none=True,
-        validate=[validate.Regexp(r"^\d{4}$"), validate.Length(equal=4)],
     )
 
 
@@ -276,11 +274,11 @@ class GEDApplicationRequestSchema(Schema):
 
 
 class GraduatedApplicationRequestSchema(Schema):
-    classification = Nested(Classification, required=True, allow_none=False)
+    classification = Nested(
+        GraduatedClassification, required=True, allow_none=False
+    )
     personal_information = Nested(
-        PersonalInformationWitGraduatedSchoolInfo,
-        required=True,
-        allow_none=False,
+        PersonalInformationWithSchoolInfo, required=True, allow_none=False
     )
     diligence_grade = Nested(DiligenceGrade, required=True, allow_none=False)
     school_grade = Nested(
@@ -293,9 +291,7 @@ class GraduatedApplicationRequestSchema(Schema):
 
 class UngraduatedApplicationRequestSchema(GraduatedApplicationRequestSchema):
     personal_information = Nested(
-        PersonalInformationWithCurrentSchoolInfo,
-        required=True,
-        allow_none=False,
+        PersonalInformationWithSchoolInfo, required=True, allow_none=False
     )
     school_grade = Nested(
         UngraduatedSchoolGrade, required=True, allow_none=False

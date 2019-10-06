@@ -37,10 +37,10 @@ from avengers.presentation.schema.application import (
     GEDApplicationRequestSchema,
     GEDGrade,
     GraduatedApplicationRequestSchema,
+    GraduatedClassification,
     GraduatedSchoolGrade,
     PersonalInformation,
-    PersonalInformationWitGraduatedSchoolInfo,
-    PersonalInformationWithCurrentSchoolInfo,
+    PersonalInformationWithSchoolInfo,
     SelfIntroductionAndStudyPlan,
     UngraduatedApplicationRequestSchema,
     UngraduatedSchoolGrade,
@@ -196,16 +196,15 @@ class ApplicationRetrieveView(HTTPMethodView):
     @jwt_required
     async def get(self, request: Request, token: Token):
         application = await self.service.get(token.jwt_identity)
-        classification = Classification().load(
-            asdict(application), unknown=EXCLUDE
-        )
 
         if isinstance(application, GedApplicationModel):
             application = asdict(application)
 
             return json(
                 {
-                    "classification": classification,
+                    "classification": Classification().load(
+                        asdict(application), unknown=EXCLUDE
+                    ),
                     "personal_information": PersonalInformation().load(
                         application, unknown=EXCLUDE
                     ),
@@ -232,8 +231,10 @@ class ApplicationRetrieveView(HTTPMethodView):
 
             return json(
                 {
-                    "classification": classification,
-                    "personal_information": PersonalInformationWitGraduatedSchoolInfo().load(
+                    "classification": GraduatedClassification().load(
+                        asdict(application), unknown=EXCLUDE
+                    ),
+                    "personal_information": PersonalInformationWithSchoolInfo().load(
                         application, unknown=EXCLUDE
                     ),
                     "diligence_grade": DiligenceGrade().load(
@@ -264,8 +265,10 @@ class ApplicationRetrieveView(HTTPMethodView):
 
             return json(
                 {
-                    "classification": classification,
-                    "personal_information": PersonalInformationWithCurrentSchoolInfo().load(
+                    "classification": Classification().load(
+                        asdict(application), unknown=EXCLUDE
+                    ),
+                    "personal_information": PersonalInformationWithSchoolInfo().load(
                         application, unknown=EXCLUDE
                     ),
                     "diligence_grade": DiligenceGrade().load(
@@ -315,11 +318,13 @@ class GraduatedApplicationView(HTTPMethodView):
     @jwt_required
     async def put(self, request: Request, token: Token):
         if not request.json:
+
             raise InvalidApplication
 
         try:
             raw_application = self.schema.load(request.json)
-        except ValidationError:
+        except ValidationError as e:
+            print(e)
             raise InvalidApplication
 
         application = {"user_email": token.jwt_identity}

@@ -63,9 +63,15 @@ class UserRepository(MySqlRepository):
             user.password,
             receipt_code,
             False if user.is_paid is None else user.is_paid,
-            False if user.is_printed_application_arrived is None else user.is_printed_application_arrived,
-            False if user.is_passed_first_apply is None else user.is_passed_first_apply,
-            False if user.is_passed_interview is None else user.is_passed_interview,
+            False
+            if user.is_printed_application_arrived is None
+            else user.is_printed_application_arrived,
+            False
+            if user.is_passed_first_apply is None
+            else user.is_passed_first_apply,
+            False
+            if user.is_passed_interview is None
+            else user.is_passed_interview,
             False if user.is_final_submit is None else user.is_final_submit,
             user.exam_code,
             user.volunteer_score,
