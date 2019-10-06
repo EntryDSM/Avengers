@@ -1,4 +1,4 @@
-from typing import Optional, Union, Tuple
+from typing import Optional, Tuple, Union
 
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.ged_application import GedApplicationModel
@@ -15,7 +15,10 @@ from avengers.data.repositories.graduated_application import (
 from avengers.data.repositories.ungraduated_application import (
     UnGraduatedApplicationRepository,
 )
-from avengers.presentation.exceptions import ApplicationNotFound, AlreadyFinalSubmitted
+from avengers.presentation.exceptions import (
+    AlreadyFinalSubmitted,
+    ApplicationNotFound,
+)
 from avengers.services.mypage import MyPageService
 
 ApplicationUnion = Union[
@@ -45,7 +48,9 @@ class ApplicationService:
     async def sync_ged_application(
         self, application: GedApplicationModel
     ) -> None:
-        if (await self.my_page_service.retrieve_status(application.user_email))["is_final_submit"]:
+        if (
+            await self.my_page_service.retrieve_status(application.user_email)
+        )["is_final_submit"]:
             raise AlreadyFinalSubmitted
 
         await self.graduated_repo.delete(application.user_email)
@@ -56,7 +61,9 @@ class ApplicationService:
     async def sync_graduated_applicant(
         self, application: GraduatedApplicationModel
     ) -> None:
-        if (await self.my_page_service.retrieve_status(application.user_email))["is_final_submit"]:
+        if (
+            await self.my_page_service.retrieve_status(application.user_email)
+        )["is_final_submit"]:
             raise AlreadyFinalSubmitted
 
         await self.ged_repo.delete(application.user_email)
@@ -67,7 +74,9 @@ class ApplicationService:
     async def sync_ungraduated_applicant(
         self, application: UngraduatedApplicationModel
     ) -> None:
-        if (await self.my_page_service.retrieve_status(application.user_email))["is_final_submit"]:
+        if (
+            await self.my_page_service.retrieve_status(application.user_email)
+        )["is_final_submit"]:
             raise AlreadyFinalSubmitted
 
         await self.ged_repo.delete(application.user_email)

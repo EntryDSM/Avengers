@@ -11,9 +11,10 @@ from avengers.data.models.ged_application import GedApplicationModel
 from avengers.data.repositories.ged_application import GedApplicationRepository
 from avengers.data.repositories.user import UserRepository
 from avengers.presentation.exceptions import (
+    AlreadyFinalSubmitted,
     ApplicationNotFound,
     FinalValidationFailed,
-    AlreadyFinalSubmitted)
+)
 from avengers.services.application import ApplicationService
 from avengers.services.mypage import MyPageService
 
@@ -26,7 +27,9 @@ class FinalizeApplicationService:
     ged_repo = GedApplicationRepository()
 
     async def final_submit(self, email):
-        if (await self.my_page_service.retrieve_status(email))["is_final_submit"]:
+        if (await self.my_page_service.retrieve_status(email))[
+            "is_final_submit"
+        ]:
             print(await self.my_page_service.retrieve_status(email))
             raise AlreadyFinalSubmitted
 

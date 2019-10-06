@@ -42,16 +42,15 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             UNGRADUATED_APPLICATION_TBL.english,
             UNGRADUATED_APPLICATION_TBL.self_introduction,
             UNGRADUATED_APPLICATION_TBL.study_plan,
-        ).where(UNGRADUATED_APPLICATION_TBL.user_email == Parameter("%s")).get_sql(
+        ).where(
+            UNGRADUATED_APPLICATION_TBL.user_email == Parameter("%s")
+        ).get_sql(
             quote_char=None
         )
         data = await self.db.fetchone(query, True, email)
         data["is_daejeon"] = bool(data["is_daejeon"])
 
-        return from_dict(
-            data_class=UngraduatedApplicationModel,
-            data=data,
-        )
+        return from_dict(data_class=UngraduatedApplicationModel, data=data)
 
     async def upsert(self, new_data: UngraduatedApplicationModel) -> None:
         try:

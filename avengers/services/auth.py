@@ -5,7 +5,11 @@ from dacite import from_dict
 from sanic_jwt_extended import create_access_token, create_refresh_token
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from avengers.config import settings, SIGNUP_EMAIL_TEMPLATE_A, SIGNUP_EMAIL_TEMPLATE_B
+from avengers.config import (
+    SIGNUP_EMAIL_TEMPLATE_A,
+    SIGNUP_EMAIL_TEMPLATE_B,
+    settings,
+)
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.user import PreUserModel, UserModel
 from avengers.data.repositories.email_sender import EmailSenderRepository

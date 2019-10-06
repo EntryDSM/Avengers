@@ -1,55 +1,59 @@
-import os
 import dataclasses
+import os
 from dataclasses import asdict
 
 import aiofiles
 from dacite import from_dict
-from marshmallow import ValidationError, EXCLUDE
+from marshmallow import EXCLUDE, ValidationError
 from sanic.exceptions import NotFound
 from sanic.request import Request
 from sanic.response import file, json
 from sanic.views import HTTPMethodView
-from sanic_jwt_extended import (
-    jwt_required,
-)
+from sanic_jwt_extended import jwt_required
 from sanic_jwt_extended.tokens import Token
 
 from avengers.config import PICTURE_DIR
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.ged_application import GedApplicationModel
-from avengers.data.models.graduated_application import GraduatedApplicationModel
-from avengers.data.models.ungraduated_application import UngraduatedApplicationModel
+from avengers.data.models.graduated_application import (
+    GraduatedApplicationModel,
+)
+from avengers.data.models.ungraduated_application import (
+    UngraduatedApplicationModel,
+)
 from avengers.data.models.user import PreUserModel
 from avengers.presentation.exceptions import (
+    ImageNotFound,
+    InvalidApplication,
     InvalidSignupInfo,
     InvalidVerificationKey,
     TokenError,
     UserNotFound,
     WrongImageData,
-    InvalidApplication, ImageNotFound)
+)
+from avengers.presentation.schema.application import (
+    Classification,
+    DiligenceGrade,
+    GEDApplicationRequestSchema,
+    GEDGrade,
+    GraduatedApplicationRequestSchema,
+    GraduatedSchoolGrade,
+    PersonalInformation,
+    PersonalInformationWitGraduatedSchoolInfo,
+    PersonalInformationWithCurrentSchoolInfo,
+    SelfIntroductionAndStudyPlan,
+    UngraduatedApplicationRequestSchema,
+    UngraduatedSchoolGrade,
+)
 from avengers.presentation.schema.auth import (
     LoginRequestSchema,
     SignUpRequestSchema,
 )
-from avengers.presentation.schema.application import (
-    GEDApplicationRequestSchema,
-    GraduatedApplicationRequestSchema,
-    UngraduatedApplicationRequestSchema,
-    Classification,
-    PersonalInformation,
-    PersonalInformationWitGraduatedSchoolInfo,
-    PersonalInformationWithCurrentSchoolInfo,
-    GEDGrade,
-    DiligenceGrade,
-    GraduatedSchoolGrade,
-    UngraduatedSchoolGrade,
-    SelfIntroductionAndStudyPlan,
-)
+from avengers.services.application import ApplicationService
 from avengers.services.auth import AuthService
+from avengers.services.finalize import FinalizeApplicationService
 from avengers.services.mypage import MyPageService
 from avengers.services.school_search import SchoolSearchService
-from avengers.services.application import ApplicationService
-from avengers.services.finalize import FinalizeApplicationService
 
 
 class SchoolSearchView(HTTPMethodView):
@@ -193,43 +197,90 @@ class ApplicationRetrieveView(HTTPMethodView):
     @jwt_required
     async def get(self, request: Request, token: Token):
         application = await self.service.get(token.jwt_identity)
-        classification = Classification().load(asdict(application), unknown=EXCLUDE)
+        classification = Classification().load(
+            asdict(application), unknown=EXCLUDE
+        )
 
         if isinstance(application, GedApplicationModel):
             application = asdict(application)
 
-            return json({
-                "classification": classification,
-                "personal_information": PersonalInformation().load(application, unknown=EXCLUDE),
-                "ged_grade": GEDGrade().load(application, unknown=EXCLUDE),
-                'self_introduction_and_study_plan': SelfIntroductionAndStudyPlan().load(application, unknown=EXCLUDE)
-            }, 200)
+            return json(
+                {
+                    "classification": classification,
+                    "personal_information": PersonalInformation().load(
+                        application, unknown=EXCLUDE
+                    ),
+                    "ged_grade": GEDGrade().load(application, unknown=EXCLUDE),
+                    'self_introduction_and_study_plan': SelfIntroductionAndStudyPlan().load(
+                        application, unknown=EXCLUDE
+                    ),
+                },
+                200,
+            )
 
         elif isinstance(application, GraduatedApplicationModel):
             application = asdict(application)
-            for v in ["korean", "social", "history", "math", "english", "tech_and_home", "science"]:
+            for v in [
+                "korean",
+                "social",
+                "history",
+                "math",
+                "english",
+                "tech_and_home",
+                "science",
+            ]:
                 application[v] = list(application[v])
 
-            return json({
-                "classification": classification,
-                "personal_information": PersonalInformationWitGraduatedSchoolInfo().load(application, unknown=EXCLUDE),
-                "diligence_grade": DiligenceGrade().load(application, unknown=EXCLUDE),
-                "school_grade": GraduatedSchoolGrade().load(application, unknown=EXCLUDE),
-                'self_introduction_and_study_plan': SelfIntroductionAndStudyPlan().load(application, unknown=EXCLUDE)
-            }, 200)
+            return json(
+                {
+                    "classification": classification,
+                    "personal_information": PersonalInformationWitGraduatedSchoolInfo().load(
+                        application, unknown=EXCLUDE
+                    ),
+                    "diligence_grade": DiligenceGrade().load(
+                        application, unknown=EXCLUDE
+                    ),
+                    "school_grade": GraduatedSchoolGrade().load(
+                        application, unknown=EXCLUDE
+                    ),
+                    'self_introduction_and_study_plan': SelfIntroductionAndStudyPlan().load(
+                        application, unknown=EXCLUDE
+                    ),
+                },
+                200,
+            )
 
         elif isinstance(application, UngraduatedApplicationModel):
             application = asdict(application)
-            for v in ["korean", "social", "history", "math", "english", "tech_and_home", "science"]:
+            for v in [
+                "korean",
+                "social",
+                "history",
+                "math",
+                "english",
+                "tech_and_home",
+                "science",
+            ]:
                 application[v] = list(application[v])
 
-            return json({
-                "classification": classification,
-                "personal_information": PersonalInformationWithCurrentSchoolInfo().load(application, unknown=EXCLUDE),
-                "diligence_grade": DiligenceGrade().load(application, unknown=EXCLUDE),
-                "school_grade": UngraduatedSchoolGrade().load(application, unknown=EXCLUDE),
-                'self_introduction_and_study_plan': SelfIntroductionAndStudyPlan().load(application, unknown=EXCLUDE)
-            }, 200)
+            return json(
+                {
+                    "classification": classification,
+                    "personal_information": PersonalInformationWithCurrentSchoolInfo().load(
+                        application, unknown=EXCLUDE
+                    ),
+                    "diligence_grade": DiligenceGrade().load(
+                        application, unknown=EXCLUDE
+                    ),
+                    "school_grade": UngraduatedSchoolGrade().load(
+                        application, unknown=EXCLUDE
+                    ),
+                    'self_introduction_and_study_plan': SelfIntroductionAndStudyPlan().load(
+                        application, unknown=EXCLUDE
+                    ),
+                },
+                200,
+            )
 
 
 class GEDApplicationView(HTTPMethodView):
@@ -250,7 +301,9 @@ class GEDApplicationView(HTTPMethodView):
         for v in raw_application.values():
             application.update(v)
 
-        application = from_dict(data_class=GedApplicationModel, data=application)
+        application = from_dict(
+            data_class=GedApplicationModel, data=application
+        )
 
         await self.service.sync_ged_application(application)
         return json({}, status=204)
@@ -274,10 +327,20 @@ class GraduatedApplicationView(HTTPMethodView):
         for v in raw_application.values():
             application.update(v)
 
-        for v in ["korean", "social", "history", "math", "english", "tech_and_home", "science"]:
+        for v in [
+            "korean",
+            "social",
+            "history",
+            "math",
+            "english",
+            "tech_and_home",
+            "science",
+        ]:
             application[v] = ''.join(application[v])
 
-        application = from_dict(data_class=GraduatedApplicationModel, data=application)
+        application = from_dict(
+            data_class=GraduatedApplicationModel, data=application
+        )
         dataclasses.replace(application, school_name="2019")
 
         await self.service.sync_graduated_applicant(application)
@@ -302,10 +365,20 @@ class UngraduatedApplicationView(HTTPMethodView):
         for v in raw_application.values():
             application.update(v)
 
-        for v in ["korean", "social", "history", "math", "english", "tech_and_home", "science"]:
+        for v in [
+            "korean",
+            "social",
+            "history",
+            "math",
+            "english",
+            "tech_and_home",
+            "science",
+        ]:
             application[v] = ''.join(application[v])
 
-        application = from_dict(data_class=UngraduatedApplicationModel, data=application)
+        application = from_dict(
+            data_class=UngraduatedApplicationModel, data=application
+        )
 
         await self.service.sync_ungraduated_applicant(application)
         return json({}, status=204)

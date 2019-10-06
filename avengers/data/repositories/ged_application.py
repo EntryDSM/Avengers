@@ -33,10 +33,7 @@ class GedApplicationRepository(MySqlRepository):
         data = await self.db.fetchone(query, True, email)
         data["is_daejeon"] = bool(data["is_daejeon"])
 
-        return from_dict(
-            data_class=GedApplicationModel,
-            data=data,
-        )
+        return from_dict(data_class=GedApplicationModel, data=data)
 
     async def upsert(self, new_data: GedApplicationModel) -> None:
         try:
