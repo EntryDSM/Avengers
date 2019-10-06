@@ -47,8 +47,8 @@ class FinalizeApplicationService:
         except DataNotFoundError:
             raise FinalValidationFailed
 
-        if not os.path.exists(f"{config.PICTURE_DIR}/{email}"):
-            raise FinalValidationFailed
+        # if not os.path.exists(f"{config.PICTURE_DIR}/{email}"):
+        #     raise FinalValidationFailed
 
         if isinstance(application, GedApplicationModel):
             grades = await _process_ged_grades(application)
@@ -56,7 +56,7 @@ class FinalizeApplicationService:
             grades = await _process_applicant_grades(application)
 
         await self.user_repo.update(
-            user.email, {**grades, 'is_final_submit': True}
+            user.email, {**grades, 'is_final_submit': False}
         )
 
 
@@ -64,12 +64,14 @@ async def _process_ged_grades(application: GedApplicationModel):
     avg_score = application.ged_average_score
     max_conversion_score = 90
 
+    # 반올림 셋째자리
     volunteer_score = round((avg_score - 40) / 60 * 12 + 3, 3)
     attendance_score = 15
 
     if application.apply_type == 'COMMON':
         max_conversion_score = 150
 
+    # 반올림 셋째자리
     conversion_score = round((avg_score - 50) / 50 * max_conversion_score, 3)
 
     return {
@@ -134,11 +136,22 @@ async def _process_applicant_grades(application: BaseCommonApplication):
             sum(first_grade_li) + third_grade_score
         ) * decimal.Decimal('0.5')
     else:
-        first_grade_score = sum(
-            [s for s in first_grade_li if isinstance(s, int)]
+        validated_first_grade = [
+            s for s in first_grade_li if isinstance(s, decimal.Decimal)
+        ]
+        validated_second_grade = [
+            s for s in second_grade_li if isinstance(s, decimal.Decimal)
+        ]
+
+        first_grade_score = (
+            validated_first_grade[0] * 2
+            if len(validated_first_grade) == 1
+            else sum(validated_first_grade)
         )
-        second_grade_score = sum(
-            [s for s in second_grade_li if isinstance(s, int)]
+        second_grade_score = (
+            validated_second_grade[0] * 2
+            if len(validated_second_grade) == 1
+            else sum(validated_second_grade)
         )
 
     multiple12 = decimal.Decimal('2.7')
@@ -148,6 +161,7 @@ async def _process_applicant_grades(application: BaseCommonApplication):
         multiple12 = decimal.Decimal('4.5')
         multiple3 = 6
 
+    # 반올림 셋째자리
     conversion_score = (
         multiple12 * (first_grade_score + second_grade_score)
         + multiple3 * third_grade_score
@@ -183,6 +197,7 @@ def _calculate_volunteer_score(volunteer_time: int) -> decimal.Decimal:
     if volunteer_time >= 50:
         volunteer_score = decimal.Decimal('15')
     elif 49 >= volunteer_time >= 15:
+        # 반올림 셋째자리
         volunteer_score = round(
             decimal.Decimal(str(volunteer_time - 14)) / 36 * 12 + 3, 3
         )
