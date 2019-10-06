@@ -5,6 +5,7 @@ class ErrorCodes:
     # code 10xx server error
     redis_error = 1002
     mysql_error = 1003
+    sendgrid_error = 1004
 
     # code 11xx application validation error
     validation_error = 1100
@@ -38,6 +39,7 @@ class ErrorDescriptions:
         "Final submitted application can't be edited."
     )
     ERR_ANY_APPLICATION_SUBMITTED_YET = "Any application submitted yet."
+    ERR_WRONG_IMAGE_DATA = "Invalid image. Only allow png, jpeg, jpg, jp2, j2c"
 
     ERR_USER_NOT_FOUND = "Login information is incorrect"
     ERR_TOKEN_ERROR = "Please login again"

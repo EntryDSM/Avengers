@@ -22,7 +22,7 @@ class BaseApplication:
 @dataclass(frozen=True)
 class BaseCommonApplication(BaseApplication):
     student_number: Optional[str]
-    school_code: Optional[str]
+    school_name: Optional[str]
     school_tel: Optional[str]
     volunteer_time: Optional[int]
     full_cut_count: Optional[int]

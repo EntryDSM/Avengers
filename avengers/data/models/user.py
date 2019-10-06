@@ -18,3 +18,9 @@ class UserModel:
     attendance_score: Optional[int]
     conversion_score: Optional[Decimal]
     final_score: Optional[Decimal]
+
+
+@dataclass
+class PreUserModel:
+    email: str
+    password: str

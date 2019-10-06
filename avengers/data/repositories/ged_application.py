@@ -26,23 +26,28 @@ class GedApplicationRepository(MySqlRepository):
             GED_APPLICATION_TBL.ged_average_score,
             GED_APPLICATION_TBL.self_introduction,
             GED_APPLICATION_TBL.study_plan,
-        ).where(GED_APPLICATION_TBL.email == Parameter("%s")).get_sql(
+        ).where(GED_APPLICATION_TBL.user_email == Parameter("%s")).get_sql(
             quote_char=None
         )
 
+        data = await self.db.fetchone(query, True, email)
+        data["is_daejeon"] = bool(data["is_daejeon"])
+
         return from_dict(
             data_class=GedApplicationModel,
-            data=await self.db.fetchone(query, email),
+            data=data,
         )
 
     async def upsert(self, new_data: GedApplicationModel) -> None:
         try:
             past_data = await self.get(new_data.user_email)
         except DataNotFoundError:
-            pass
+            print("Except")
         else:
+            print("Else")
             await self.delete(past_data.user_email)
         finally:
+            print("final")
             await self.insert(new_data)
 
     async def insert(self, data: GedApplicationModel):
@@ -68,7 +73,7 @@ class GedApplicationRepository(MySqlRepository):
 
     async def delete(self, email: str):
         query: str = Query.from_(GED_APPLICATION_TBL).delete().where(
-            GED_APPLICATION_TBL.email == Parameter("%s")
+            GED_APPLICATION_TBL.user_email == Parameter("%s")
         ).get_sql(quote_char=None)
 
         await self.db.execute(query, email)

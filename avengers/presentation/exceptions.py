@@ -24,6 +24,12 @@ class MySQLOperationError(AvengersException):
     description = descriptions.ERR_DATABASE
 
 
+@add_status_code(503)
+class SendgridError(AvengersException):
+    error_code = error_codes.sendgrid_error
+    descriptions = descriptions.ERR_DATABASE
+
+
 @add_status_code(400)
 class InvalidApplication(AvengersException):
     error_code = error_codes.validation_error
@@ -45,6 +51,12 @@ class AlreadyFinalSubmitted(AvengersException):
 class ApplicationNotFound(AvengersException):
     error_code = error_codes.any_application_submitted_yet
     descriptions = descriptions.ERR_ANY_APPLICATION_SUBMITTED_YET
+
+
+@add_status_code(404)
+class WrongImageData(AvengersException):
+    error_code = error_codes.validation_error
+    description = descriptions.ERR_WRONG_IMAGE_DATA
 
 
 @add_status_code(403)

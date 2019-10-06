@@ -6,14 +6,13 @@ from avengers.presentation.exceptions import SendgridError
 
 
 class EmailSenderRepository:
-
     @classmethod
     async def send_mail(cls, address: str, title: str, content: str):
         message = Mail(
             from_email="entrydsm@dsm.hs.kr",
             to_emails=address,
             subject=title,
-            html_content=content
+            html_content=content,
         )
 
         try:
