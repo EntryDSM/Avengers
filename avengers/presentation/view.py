@@ -203,7 +203,7 @@ class ApplicationRetrieveView(HTTPMethodView):
             return json(
                 {
                     "classification": Classification().load(
-                        asdict(application), unknown=EXCLUDE
+                        application, unknown=EXCLUDE
                     ),
                     "personal_information": PersonalInformation().load(
                         application, unknown=EXCLUDE
@@ -232,7 +232,7 @@ class ApplicationRetrieveView(HTTPMethodView):
             return json(
                 {
                     "classification": GraduatedClassification().load(
-                        asdict(application), unknown=EXCLUDE
+                        application, unknown=EXCLUDE
                     ),
                     "personal_information": PersonalInformationWithSchoolInfo().load(
                         application, unknown=EXCLUDE
@@ -266,7 +266,7 @@ class ApplicationRetrieveView(HTTPMethodView):
             return json(
                 {
                     "classification": Classification().load(
-                        asdict(application), unknown=EXCLUDE
+                        application, unknown=EXCLUDE
                     ),
                     "personal_information": PersonalInformationWithSchoolInfo().load(
                         application, unknown=EXCLUDE
@@ -362,7 +362,8 @@ class UngraduatedApplicationView(HTTPMethodView):
 
         try:
             raw_application = self.schema.load(request.json)
-        except ValidationError:
+        except ValidationError as e:
+            print(e)
             raise InvalidApplication
 
         application = {"user_email": token.jwt_identity}

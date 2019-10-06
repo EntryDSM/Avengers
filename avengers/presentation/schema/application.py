@@ -290,6 +290,9 @@ class GraduatedApplicationRequestSchema(Schema):
 
 
 class UngraduatedApplicationRequestSchema(GraduatedApplicationRequestSchema):
+    classification = Nested(
+        Classification, required=True, allow_none=False
+    )
     personal_information = Nested(
         PersonalInformationWithSchoolInfo, required=True, allow_none=False
     )
