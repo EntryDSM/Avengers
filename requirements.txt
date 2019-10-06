@@ -9,7 +9,7 @@ cffi==1.12.3
 chardet==3.0.4
 cryptography==2.7
 dacite==1.0.2
-entry-logger-sanic==0.1.6
+entry-logger-sanic==0.1.7
 h11==0.8.1
 h2==3.1.1
 hiredis==1.0.0
