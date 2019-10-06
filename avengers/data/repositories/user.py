@@ -39,7 +39,7 @@ class UserRepository(MySqlRepository):
             "is_passed_interview",
             "is_final_submit",
         ]:
-            data[i] = bool([i])
+            data[i] = bool(data[i])
 
         return from_dict(data_class=UserModel, data=data)
 

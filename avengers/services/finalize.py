@@ -1,6 +1,10 @@
 import decimal
+import os
 from dataclasses import asdict
 
+import aiofiles
+
+from avengers import config
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models import BaseCommonApplication
 from avengers.data.models.ged_application import GedApplicationModel
@@ -23,6 +27,7 @@ class FinalizeApplicationService:
 
     async def final_submit(self, email):
         if (await self.my_page_service.retrieve_status(email))["is_final_submit"]:
+            print(await self.my_page_service.retrieve_status(email))
             raise AlreadyFinalSubmitted
 
         try:
@@ -37,6 +42,9 @@ class FinalizeApplicationService:
         try:
             user = await self.user_repo.get(email)
         except DataNotFoundError:
+            raise FinalValidationFailed
+
+        if not os.path.exists(f"{config.PICTURE_DIR}/{email}"):
             raise FinalValidationFailed
 
         if isinstance(application, GedApplicationModel):
