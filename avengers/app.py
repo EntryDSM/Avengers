@@ -39,9 +39,9 @@ def create_app():
     app.config["JWT_ERROR_MESSAGE_KEY"] = "description"
     JWTManager(app)
 
-    @app.route("/")
+    @app.route("/api/v1/ping")
     async def index(_):  # pylint: disable=unused-variable
-        return response.json({"version": __version__})
+        return response.json({"service": "avengers", "version": __version__})
 
     app.blueprint(bp)
 
