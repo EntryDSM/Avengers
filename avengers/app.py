@@ -36,6 +36,7 @@ def create_app():
     app.config["JWT_REFRESH_EXPIRES"] = timedelta(
         seconds=settings.JWT_REFRESH_EXPIRES
     )
+    app.config["JWT_ERROR_MESSAGE_KEY"] = "description"
     JWTManager(app)
 
     @app.route("/")
