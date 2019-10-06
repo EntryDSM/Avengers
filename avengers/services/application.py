@@ -28,10 +28,10 @@ class ApplicationService:
     graduated_repo = GraduatedApplicationRepository()
     ungraduated_repo = UnGraduatedApplicationRepository()
 
-    async def get(self, email: str) -> Tuple[ApplicationUnion, str]:
-        ged = await _get_optional_data(email, self.ged_repo), "GED"
-        graduated = await _get_optional_data(email, self.graduated_repo), "GRADUATED"
-        ungraduated = await _get_optional_data(email, self.ungraduated_repo), "UNGRADUATED"
+    async def get(self, email: str) -> ApplicationUnion:
+        ged = await _get_optional_data(email, self.ged_repo)
+        graduated = await _get_optional_data(email, self.graduated_repo)
+        ungraduated = await _get_optional_data(email, self.ungraduated_repo)
 
         res = ged or graduated or ungraduated
         if not res:

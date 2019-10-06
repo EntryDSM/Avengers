@@ -26,7 +26,7 @@ class FinalizeApplicationService:
             raise FinalValidationFailed
 
         for c in asdict(application).values():
-            if not c:
+            if c is None:
                 raise FinalValidationFailed
 
         try:

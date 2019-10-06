@@ -7,7 +7,7 @@ from avengers.data.models.ungraduated_application import (
 )
 from avengers.data.repositories import MySqlRepository
 
-UNGRADUATED_APPLICATION_TBL = Table('graduated_application')
+UNGRADUATED_APPLICATION_TBL = Table('ungraduated_application')
 
 
 class UnGraduatedApplicationRepository(MySqlRepository):
@@ -26,7 +26,7 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             UNGRADUATED_APPLICATION_TBL.address,
             UNGRADUATED_APPLICATION_TBL.post_code,
             UNGRADUATED_APPLICATION_TBL.student_number,
-            UNGRADUATED_APPLICATION_TBL.school_code,
+            UNGRADUATED_APPLICATION_TBL.school_name,
             UNGRADUATED_APPLICATION_TBL.school_tel,
             UNGRADUATED_APPLICATION_TBL.volunteer_time,
             UNGRADUATED_APPLICATION_TBL.full_cut_count,
@@ -42,13 +42,15 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             UNGRADUATED_APPLICATION_TBL.english,
             UNGRADUATED_APPLICATION_TBL.self_introduction,
             UNGRADUATED_APPLICATION_TBL.study_plan,
-        ).where(UNGRADUATED_APPLICATION_TBL.email == Parameter("%s")).get_sql(
+        ).where(UNGRADUATED_APPLICATION_TBL.user_email == Parameter("%s")).get_sql(
             quote_char=None
         )
+        data = await self.db.fetchone(query, True, email)
+        data["is_daejeon"] = bool(data["is_daejeon"])
 
         return from_dict(
             data_class=UngraduatedApplicationModel,
-            data=await self.db.fetchone(query, email),
+            data=data,
         )
 
     async def upsert(self, new_data: UngraduatedApplicationModel) -> None:
@@ -76,7 +78,7 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             data.address,
             data.post_code,
             data.student_number,
-            data.school_code,
+            data.school_name,
             data.school_tel,
             data.volunteer_time,
             data.full_cut_count,
@@ -98,7 +100,7 @@ class UnGraduatedApplicationRepository(MySqlRepository):
 
     async def delete(self, email: str):
         query: str = Query.from_(UNGRADUATED_APPLICATION_TBL).delete().where(
-            UNGRADUATED_APPLICATION_TBL.email == Parameter("%s")
+            UNGRADUATED_APPLICATION_TBL.user_email == Parameter("%s")
         ).get_sql(quote_char=None)
 
         await self.db.execute(query, email)

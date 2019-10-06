@@ -1,4 +1,5 @@
 import os
+import dataclasses
 from dataclasses import asdict
 
 import aiofiles
@@ -188,28 +189,38 @@ class ApplicationRetrieveView(HTTPMethodView):
 
     @jwt_required
     async def get(self, request: Request, token: Token):
-        application, kind = await self.service.get(token.jwt_identity)
-        application = asdict(application)
+        application = await self.service.get(token.jwt_identity)
+        classification = Classification().load(asdict(application), unknown=EXCLUDE)
 
-        classification = Classification().load(application, unknown=EXCLUDE)
+        if isinstance(application, GedApplicationModel):
+            application = asdict(application)
 
-        if kind == "GED":
             return json({
                 "classification": classification,
                 "personal_information": PersonalInformation().load(application, unknown=EXCLUDE),
                 "ged_grade": GEDGrade().load(application, unknown=EXCLUDE),
                 'self_introduction_and_study_plan': SelfIntroductionAndStudyPlan().load(application, unknown=EXCLUDE)
             }, 200)
-        elif kind == "GRADUATED":
-            json({
+
+        elif isinstance(application, GraduatedApplicationModel):
+            application = asdict(application)
+            for v in ["korean", "social", "history", "math", "english", "tech_and_home", "science"]:
+                application[v] = list(application[v])
+
+            return json({
                 "classification": classification,
                 "personal_information": PersonalInformationWitGraduatedSchoolInfo().load(application, unknown=EXCLUDE),
                 "diligence_grade": DiligenceGrade().load(application, unknown=EXCLUDE),
                 "school_grade": GraduatedSchoolGrade().load(application, unknown=EXCLUDE),
                 'self_introduction_and_study_plan': SelfIntroductionAndStudyPlan().load(application, unknown=EXCLUDE)
             }, 200)
-        elif kind == "UNGRADUATED":
-            json({
+
+        elif isinstance(application, UngraduatedApplicationModel):
+            application = asdict(application)
+            for v in ["korean", "social", "history", "math", "english", "tech_and_home", "science"]:
+                application[v] = list(application[v])
+
+            return json({
                 "classification": classification,
                 "personal_information": PersonalInformationWithCurrentSchoolInfo().load(application, unknown=EXCLUDE),
                 "diligence_grade": DiligenceGrade().load(application, unknown=EXCLUDE),
@@ -223,7 +234,7 @@ class GEDApplicationView(HTTPMethodView):
     schema = GEDApplicationRequestSchema()
 
     @jwt_required
-    async def patch(self, request: Request, token: Token):
+    async def put(self, request: Request, token: Token):
         if not request.json:
             raise InvalidApplication
 
@@ -232,7 +243,7 @@ class GEDApplicationView(HTTPMethodView):
         except ValidationError:
             raise InvalidApplication
 
-        application = {}
+        application = {"user_email": token.jwt_identity}
         for v in raw_application.values():
             application.update(v)
 
@@ -247,7 +258,7 @@ class GraduatedApplicationView(HTTPMethodView):
     schema = GraduatedApplicationRequestSchema()
 
     @jwt_required
-    async def patch(self, request: Request, token: Token):
+    async def put(self, request: Request, token: Token):
         if not request.json:
             raise InvalidApplication
 
@@ -256,11 +267,15 @@ class GraduatedApplicationView(HTTPMethodView):
         except ValidationError:
             raise InvalidApplication
 
-        application = {}
+        application = {"user_email": token.jwt_identity}
         for v in raw_application.values():
             application.update(v)
 
+        for v in ["korean", "social", "history", "math", "english", "tech_and_home", "science"]:
+            application[v] = ''.join(application[v])
+
         application = from_dict(data_class=GraduatedApplicationModel, data=application)
+        dataclasses.replace(application, school_name="2019")
 
         await self.service.sync_graduated_applicant(application)
         return json({}, status=204)
@@ -271,7 +286,7 @@ class UngraduatedApplicationView(HTTPMethodView):
     schema = UngraduatedApplicationRequestSchema()
 
     @jwt_required
-    async def patch(self, request: Request, token: Token):
+    async def put(self, request: Request, token: Token):
         if not request.json:
             raise InvalidApplication
 
@@ -280,9 +295,12 @@ class UngraduatedApplicationView(HTTPMethodView):
         except ValidationError:
             raise InvalidApplication
 
-        application = {}
+        application = {"user_email": token.jwt_identity}
         for v in raw_application.values():
             application.update(v)
+
+        for v in ["korean", "social", "history", "math", "english", "tech_and_home", "science"]:
+            application[v] = ''.join(application[v])
 
         application = from_dict(data_class=UngraduatedApplicationModel, data=application)
 

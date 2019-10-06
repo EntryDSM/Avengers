@@ -45,7 +45,7 @@ class UserRepository(MySqlRepository):
 
     async def update(self, email: str, target: Dict[str, Any]):
         query = Query.update(USER_TBL).where(
-            USER_TBL.applicant_email == Parameter("%s")
+            USER_TBL.email == Parameter("%s")
         )
 
         for col in target:

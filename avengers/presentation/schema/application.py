@@ -68,7 +68,7 @@ class PersonalInformation(Schema):
     )
 
 
-class PersonalInformationWithCurrentSchoolInfo(Schema):
+class PersonalInformationWithCurrentSchoolInfo(PersonalInformation):
     student_number = String(
         required=True, allow_none=True, validate=validate.Regexp(r"\d{5}")
     )
