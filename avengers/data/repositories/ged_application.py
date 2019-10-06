@@ -39,12 +39,10 @@ class GedApplicationRepository(MySqlRepository):
         try:
             past_data = await self.get(new_data.user_email)
         except DataNotFoundError:
-            print("Except")
+            pass
         else:
-            print("Else")
             await self.delete(past_data.user_email)
         finally:
-            print("final")
             await self.insert(new_data)
 
     async def insert(self, data: GedApplicationModel):

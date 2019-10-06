@@ -28,7 +28,6 @@ class FinalizeApplicationService:
         if (await self.my_page_service.retrieve_status(email))[
             "is_final_submit"
         ]:
-            print(await self.my_page_service.retrieve_status(email))
             raise AlreadyFinalSubmitted
 
         try:

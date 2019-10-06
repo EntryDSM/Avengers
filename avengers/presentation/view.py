@@ -85,7 +85,6 @@ class SignUpView(HTTPMethodView):
 
     async def post(self, request: Request):
         if not request.json:
-            print(1)
             raise InvalidSignupInfo
 
         try:

@@ -98,7 +98,6 @@ class GraduatedApplicationRepository(MySqlRepository):
             data.self_introduction,
             data.study_plan,
         ).get_sql(quote_char=None)
-        print(query)
         await self.db.execute(query)
 
     async def delete(self, email: str):
