@@ -86,7 +86,7 @@ class PersonalInformationWithSchoolInfo(PersonalInformation):
     school_tel = String(
         required=True,
         allow_none=True,
-        validate=validate.Regexp(r"^01\d{8,9}$"),
+        validate=validate.Regexp(r"^(0(1[0-9]|2|3[1-3]|4[1-4]|5[1-5]|6[1-4]))(\d{3,4})(\d{4})$"),
     )
 
 
