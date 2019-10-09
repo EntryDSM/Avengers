@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
+from decimal import Decimal
 from typing import Optional
 
 
@@ -24,6 +25,7 @@ class BaseCommonApplication(BaseApplication):
     student_number: Optional[str]
     school_name: Optional[str]
     school_tel: Optional[str]
+    school_code: Optional[str]
     volunteer_time: Optional[int]
     full_cut_count: Optional[int]
     period_cut_count: Optional[int]
@@ -38,3 +40,6 @@ class BaseCommonApplication(BaseApplication):
     english: Optional[str]
     self_introduction: Optional[str]
     study_plan: Optional[str]
+    first_grade_score: Optional[Decimal]
+    second_grade_score: Optional[Decimal]
+    third_grade_score: Optional[Decimal]

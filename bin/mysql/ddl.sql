@@ -90,7 +90,7 @@ create table if not exists graduated_application
     study_plan          varchar(1600)                                                                                                                                                          null,
     first_grade_score  decimal(10, 5) null,
     second_grade_score  decimal(10, 5) null,
-    third_grade_score  decimal(10, 5) null,
+    third_grade_score  decimal(10, 5) null
 )
     collate = utf8mb4_unicode_ci;
 
@@ -126,7 +126,10 @@ create table if not exists ungraduated_application
     tech_and_home     varchar(5)                                                                                                                                                             null,
     english           varchar(5)                                                                                                                                                             null,
     self_introduction  varchar(1600)                                                                                                                                                          null,
-    study_plan        varchar(1600)                                                                                                                                                          null
+    study_plan        varchar(1600)                                                                                                                                                          null,
+    first_grade_score   decimal(10, 5)                                                                                                                                                       null,
+    second_grade_score  decimal(10, 5)                                                                                                                                                       null,
+    third_grade_score   decimal(10, 5)                                                                                                                                                       null
 )
     collate = utf8mb4_unicode_ci;
 

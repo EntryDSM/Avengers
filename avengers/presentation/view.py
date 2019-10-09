@@ -1,6 +1,7 @@
 import dataclasses
 import os
 from dataclasses import asdict
+from decimal import Decimal
 
 import aiofiles
 from dacite import from_dict
@@ -331,6 +332,8 @@ class GraduatedApplicationView(HTTPMethodView):
         for v in raw_application.values():
             application.update(v)
 
+        print(application)
+
         for v in [
             "korean",
             "social",
@@ -341,6 +344,8 @@ class GraduatedApplicationView(HTTPMethodView):
             "science",
         ]:
             application[v] = ''.join(application[v])
+
+        print(application)
 
         application = from_dict(
             data_class=GraduatedApplicationModel, data=application
@@ -397,3 +402,13 @@ class FinalSubmitView(HTTPMethodView):
         await self.service.final_submit(token.jwt_identity)
 
         return json({}, status=204)
+
+
+class CalculatedScoreView(HTTPMethodView):
+    service = ApplicationService()
+
+    @jwt_required
+    async def get(self, request: Request, token: Token):
+        calculated = await self.service.get_calculated_score(token.jwt_identity)
+
+        return json(calculated)

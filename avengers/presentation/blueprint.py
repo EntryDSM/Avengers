@@ -19,3 +19,4 @@ bp.add_route(
     view.UngraduatedApplicationView.as_view(), "/self/application/ungraduated"
 )
 bp.add_route(view.FinalSubmitView.as_view(), "/self/application/final-submit")
+bp.add_route(view.CalculatedScoreView.as_view(), "/self/application/calculated-score")

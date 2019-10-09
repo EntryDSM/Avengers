@@ -170,6 +170,9 @@ async def _process_applicant_grades(application: BaseCommonApplication):
         "attendance_score": attendance_score,
         "conversion_score": conversion_score,
         "final_score": volunteer_score + attendance_score + conversion_score,
+        "first_grade_score": first_grade_score,
+        "second_grade_score": second_grade_score,
+        "third_grade_score": third_grade_score,
     }
 
 

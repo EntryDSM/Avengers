@@ -28,6 +28,7 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             UNGRADUATED_APPLICATION_TBL.student_number,
             UNGRADUATED_APPLICATION_TBL.school_name,
             UNGRADUATED_APPLICATION_TBL.school_tel,
+            UNGRADUATED_APPLICATION_TBL.school_code,
             UNGRADUATED_APPLICATION_TBL.volunteer_time,
             UNGRADUATED_APPLICATION_TBL.full_cut_count,
             UNGRADUATED_APPLICATION_TBL.period_cut_count,
@@ -42,6 +43,9 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             UNGRADUATED_APPLICATION_TBL.english,
             UNGRADUATED_APPLICATION_TBL.self_introduction,
             UNGRADUATED_APPLICATION_TBL.study_plan,
+            UNGRADUATED_APPLICATION_TBL.first_grade_score,
+            UNGRADUATED_APPLICATION_TBL.second_grade_score,
+            UNGRADUATED_APPLICATION_TBL.third_grade_score,
         ).where(
             UNGRADUATED_APPLICATION_TBL.user_email == Parameter("%s")
         ).get_sql(
@@ -79,6 +83,7 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             data.student_number,
             data.school_name,
             data.school_tel,
+            data.school_code,
             data.volunteer_time,
             data.full_cut_count,
             data.period_cut_count,
@@ -93,6 +98,9 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             data.english,
             data.self_introduction,
             data.study_plan,
+            data.first_grade_score,
+            data.second_grade_score,
+            data.third_grade_score,
         ).get_sql(quote_char=None)
 
         await self.db.execute(query)

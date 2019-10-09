@@ -88,6 +88,11 @@ class PersonalInformationWithSchoolInfo(PersonalInformation):
         allow_none=True,
         validate=validate.Regexp(r"^(0(1[0-9]|2|3[1-3]|4[1-4]|5[1-5]|6[1-4]))(\d{3,4})(\d{4})$"),
     )
+    school_code = String(
+        required=True,
+        allow_none=True,
+        validate=validate.Length(min=7)
+    )
 
 
 class GEDGrade(Schema):

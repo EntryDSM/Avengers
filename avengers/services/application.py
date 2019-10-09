@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Dict, Any
 
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models.ged_application import GedApplicationModel
@@ -15,10 +15,11 @@ from avengers.data.repositories.graduated_application import (
 from avengers.data.repositories.ungraduated_application import (
     UnGraduatedApplicationRepository,
 )
+from avengers.data.repositories.user import UserRepository
 from avengers.presentation.exceptions import (
     AlreadyFinalSubmitted,
     ApplicationNotFound,
-)
+    UserNotFound, FinalValidationFailed, InvalidApplication)
 from avengers.services.mypage import MyPageService
 
 ApplicationUnion = Union[
@@ -30,6 +31,7 @@ ApplicationUnion = Union[
 class ApplicationService:
     my_page_service = MyPageService()
 
+    user_repo = UserRepository()
     ged_repo = GedApplicationRepository()
     graduated_repo = GraduatedApplicationRepository()
     ungraduated_repo = UnGraduatedApplicationRepository()
@@ -83,6 +85,35 @@ class ApplicationService:
         await self.graduated_repo.delete(application.user_email)
 
         await self.ungraduated_repo.upsert(application)
+
+    async def get_calculated_score(self, email: str) -> Dict[str, Any]:
+        try:
+            user = await self.user_repo.get(email)
+        except DataNotFoundError:
+            raise UserNotFound
+
+        scores = {
+            "volunteer_score": user.volunteer_score,
+            "attendance_score": user.attendance_score,
+            "conversion_score": user.conversion_score,
+            "final_score": user.final_score
+        }
+
+        print(scores)
+
+        application = await self.get(email)
+
+        print("asdfasdfasdf")
+
+        if isinstance(application, GedApplicationModel):
+            scores["ged_average_score"] = application.ged_average_score
+
+        else:
+            scores["first_grade_score"] = application.first_grade_score
+            scores["second_grade_score"] = application.second_grade_score
+            scores["third_grade_score"] = application.third_grade_score
+
+        return scores
 
 
 async def _get_optional_data(email: str, repo) -> Optional[ApplicationUnion]:

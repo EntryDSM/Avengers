@@ -29,6 +29,7 @@ class GraduatedApplicationRepository(MySqlRepository):
             GRADUATED_APPLICATION_TBL.graduated_year,
             GRADUATED_APPLICATION_TBL.school_name,
             GRADUATED_APPLICATION_TBL.school_tel,
+            GRADUATED_APPLICATION_TBL.school_code,
             GRADUATED_APPLICATION_TBL.volunteer_time,
             GRADUATED_APPLICATION_TBL.full_cut_count,
             GRADUATED_APPLICATION_TBL.period_cut_count,
@@ -43,6 +44,9 @@ class GraduatedApplicationRepository(MySqlRepository):
             GRADUATED_APPLICATION_TBL.english,
             GRADUATED_APPLICATION_TBL.self_introduction,
             GRADUATED_APPLICATION_TBL.study_plan,
+            GRADUATED_APPLICATION_TBL.first_grade_score,
+            GRADUATED_APPLICATION_TBL.second_grade_score,
+            GRADUATED_APPLICATION_TBL.third_grade_score,
         ).where(
             GRADUATED_APPLICATION_TBL.user_email == Parameter("%s")
         ).get_sql(
@@ -65,7 +69,6 @@ class GraduatedApplicationRepository(MySqlRepository):
             await self.insert(new_data)
 
     async def insert(self, data: GraduatedApplicationModel):
-        print(data)
         query: str = Query.into(GRADUATED_APPLICATION_TBL).insert(
             data.user_email,
             data.apply_type,
@@ -81,7 +84,7 @@ class GraduatedApplicationRepository(MySqlRepository):
             data.post_code,
             data.student_number,
             data.graduated_year,
-            data.school_name,
+            data.school_code,
             data.school_tel,
             data.volunteer_time,
             data.full_cut_count,
@@ -97,6 +100,10 @@ class GraduatedApplicationRepository(MySqlRepository):
             data.english,
             data.self_introduction,
             data.study_plan,
+            data.first_grade_score,
+            data.second_grade_score,
+            data.third_grade_score,
+            data.school_name,
         ).get_sql(quote_char=None)
         await self.db.execute(query)
 
