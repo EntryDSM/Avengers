@@ -1,11 +1,16 @@
+from avengers.data.exc import DataNotFoundError
 from avengers.data.repositories.user import UserRepository
+from avengers.presentation.exceptions import UserNotFound
 
 
 class MyPageService:
     repo = UserRepository()
 
     async def retrieve_status(self, user_email: str):
-        result = await self.repo.get(user_email)
+        try:
+            result = await self.repo.get(user_email)
+        except DataNotFoundError:
+            raise UserNotFound
 
         return {
             "receipt_code": result.receipt_code,
