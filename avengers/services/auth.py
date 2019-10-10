@@ -90,4 +90,8 @@ class AuthService:
         return await create_access_token(app, email)
 
     async def logout(self, token: str):
+        is_token_saved = await self.token_repo.get(token)
+        if not is_token_saved:
+            raise TokenError
+
         await self.token_repo.delete(token)
