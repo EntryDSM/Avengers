@@ -37,11 +37,13 @@ after_success:
 deploy:
   - provider: script
     script: bash ./docker-deploy.sh master
+    wait_until_deployed: true
     on:
       branch: master
 
   - provider: script
     script: bash ./docker-deploy.sh develop
+    wait_until_deployed: true
     on:
       branch: develop
 
