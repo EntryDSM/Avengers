@@ -342,6 +342,9 @@ class GraduatedApplicationView(HTTPMethodView):
         ]:
             application[v] = ''.join(application[v])
 
+        for key in ["first_grade_score", "second_grade_score", "third_grade_score"]:
+            application[key] = Decimal()
+
         application = from_dict(
             data_class=GraduatedApplicationModel, data=application
         )
@@ -380,6 +383,9 @@ class UngraduatedApplicationView(HTTPMethodView):
             "science",
         ]:
             application[v] = ''.join(application[v])
+
+        for key in ["first_grade_score", "second_grade_score", "third_grade_score"]:
+            application[key] = Decimal()
 
         application = from_dict(
             data_class=UngraduatedApplicationModel, data=application

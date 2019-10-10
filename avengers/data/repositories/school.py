@@ -8,7 +8,6 @@ class SchoolRepository(MySqlRepository):
         query = "SELECT school_full_name, code FROM school WHERE school_name LIKE %s"
 
         result = await self.db.fetch(query, f"%{key}%")
-        print(result)
         result = [{"name": i["school_full_name"], "code": i["code"]} for i in result]
 
         return result
