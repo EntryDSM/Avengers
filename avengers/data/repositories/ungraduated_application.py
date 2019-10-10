@@ -81,9 +81,8 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             data.address,
             data.post_code,
             data.student_number,
-            data.school_name,
-            data.school_tel,
             data.school_code,
+            data.school_tel,
             data.volunteer_time,
             data.full_cut_count,
             data.period_cut_count,
@@ -101,6 +100,7 @@ class UnGraduatedApplicationRepository(MySqlRepository):
             data.first_grade_score,
             data.second_grade_score,
             data.third_grade_score,
+            data.school_name,
         ).get_sql(quote_char=None)
 
         await self.db.execute(query)

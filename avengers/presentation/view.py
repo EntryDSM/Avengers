@@ -319,7 +319,6 @@ class GraduatedApplicationView(HTTPMethodView):
     @jwt_required
     async def put(self, request: Request, token: Token):
         if not request.json:
-
             raise InvalidApplication
 
         try:
@@ -332,8 +331,6 @@ class GraduatedApplicationView(HTTPMethodView):
         for v in raw_application.values():
             application.update(v)
 
-        print(application)
-
         for v in [
             "korean",
             "social",
@@ -344,8 +341,6 @@ class GraduatedApplicationView(HTTPMethodView):
             "science",
         ]:
             application[v] = ''.join(application[v])
-
-        print(application)
 
         application = from_dict(
             data_class=GraduatedApplicationModel, data=application
