@@ -2,11 +2,17 @@ import decimal
 import os
 from dataclasses import asdict
 
+from dacite import from_dict
+
 from avengers import config
 from avengers.data.exc import DataNotFoundError
 from avengers.data.models import BaseCommonApplication
 from avengers.data.models.ged_application import GedApplicationModel
+from avengers.data.models.graduated_application import GraduatedApplicationModel
+from avengers.data.models.ungraduated_application import UngraduatedApplicationModel
 from avengers.data.repositories.ged_application import GedApplicationRepository
+from avengers.data.repositories.graduated_application import GraduatedApplicationRepository
+from avengers.data.repositories.ungraduated_application import UnGraduatedApplicationRepository
 from avengers.data.repositories.user import UserRepository
 from avengers.presentation.exceptions import (
     AlreadyFinalSubmitted,
@@ -23,6 +29,8 @@ class FinalizeApplicationService:
 
     user_repo = UserRepository()
     ged_repo = GedApplicationRepository()
+    graduated_repo = GraduatedApplicationRepository()
+    ungraduated_repo = UnGraduatedApplicationRepository()
 
     async def final_submit(self, email):
         if (await self.my_page_service.retrieve_status(email))[
@@ -49,8 +57,19 @@ class FinalizeApplicationService:
 
         if isinstance(application, GedApplicationModel):
             grades = await _process_ged_grades(application)
+
         else:
-            grades = await _process_applicant_grades(application)
+            grades, application_grade_score = await _process_applicant_grades(application)
+            new_application = asdict(application)
+            new_application.update(**application_grade_score)
+
+            if isinstance(application, GraduatedApplicationModel):
+                new_application = from_dict(data_class=GraduatedApplicationModel, data=new_application)
+                await self.graduated_repo.upsert(new_application)
+
+            elif isinstance(application, UngraduatedApplicationModel):
+                new_application = from_dict(data_class=UngraduatedApplicationModel, data=new_application)
+                await self.ungraduated_repo.upsert(new_application)
 
         await self.user_repo.update(
             user.email, {**grades, 'is_final_submit': True}
@@ -166,14 +185,15 @@ async def _process_applicant_grades(application: BaseCommonApplication):
     ).quantize(decimal.Decimal("0.001"), decimal.ROUND_HALF_UP)
 
     return {
-        "volunteer_score": volunteer_score,
-        "attendance_score": attendance_score,
-        "conversion_score": conversion_score,
-        "final_score": volunteer_score + attendance_score + conversion_score,
-        "first_grade_score": first_grade_score,
-        "second_grade_score": second_grade_score,
-        "third_grade_score": third_grade_score,
-    }
+               "volunteer_score": volunteer_score,
+               "attendance_score": attendance_score,
+               "conversion_score": conversion_score,
+               "final_score": volunteer_score + attendance_score + conversion_score,
+           }, {
+               "first_grade_score": first_grade_score,
+               "second_grade_score": second_grade_score,
+               "third_grade_score": third_grade_score,
+           }
 
 
 def _convert_to_score(subject_score: str) -> list:
