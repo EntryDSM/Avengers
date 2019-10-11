@@ -81,7 +81,7 @@ async def _process_ged_grades(application: GedApplicationModel):
     max_conversion_score = 90
 
     volunteer_score = decimal.Decimal(
-        (avg_score - 40) / 60 * 12 + 3, 3
+        (avg_score - 40) / 60 * 12 + 3
     ).quantize(decimal.Decimal('0.001'), decimal.ROUND_HALF_UP)
     attendance_score = 15
 
@@ -179,9 +179,12 @@ async def _process_applicant_grades(application: BaseCommonApplication):
         multiple12 = decimal.Decimal('4.5')
         multiple3 = 6
 
+    first_grade_score *= multiple12
+    second_grade_score *= multiple12
+    third_grade_score *= multiple3
+
     conversion_score = decimal.Decimal(
-        multiple12 * (first_grade_score + second_grade_score)
-        + multiple3 * third_grade_score
+        first_grade_score + second_grade_score + third_grade_score
     ).quantize(decimal.Decimal("0.001"), decimal.ROUND_HALF_UP)
 
     return {
