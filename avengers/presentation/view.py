@@ -54,6 +54,7 @@ from avengers.services.application import ApplicationService
 from avengers.services.auth import AuthService
 from avengers.services.finalize import FinalizeApplicationService
 from avengers.services.mypage import MyPageService
+from avengers.services.password import ResetPasswordService
 from avengers.services.school_search import SchoolSearchService
 
 
@@ -413,3 +414,45 @@ class CalculatedScoreView(HTTPMethodView):
         calculated = await self.service.get_calculated_score(token.jwt_identity)
 
         return json(calculated)
+
+
+class ResetPasswordView(HTTPMethodView):
+    service = ResetPasswordService()
+
+    async def post(self, request: Request):
+        if not request.json:
+            raise UserNotFound
+
+        email = request.json.get("email")
+        if not email:
+            raise UserNotFound
+
+        await self.service.send_email(email)
+
+        return json({}, status=204)
+
+    async def put(self, request: Request):
+        if not request.json:
+            raise UserNotFound
+
+        email = request.json.get("email")
+        password = request.json.get("password")
+
+        if not email or not password:
+            raise UserNotFound
+
+        await self.service.reset_password(email, password)
+
+        return json({}, status=204)
+
+
+class ResetPasswordVerifyView(HTTPMethodView):
+    service = ResetPasswordService()
+
+    async def get(self, request: Request, email: str, verify_code: str):
+        if not email or not verify_code:
+            raise InvalidVerificationKey
+
+        await self.service.verify_key(email, verify_code)
+
+        return json({}, status=204)

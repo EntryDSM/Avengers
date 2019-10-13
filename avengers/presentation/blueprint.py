@@ -20,3 +20,5 @@ bp.add_route(
 )
 bp.add_route(view.FinalSubmitView.as_view(), "/self/application/final-submit")
 bp.add_route(view.CalculatedScoreView.as_view(), "/self/application/calculated-score")
+bp.add_route(view.ResetPasswordView.as_view(), "/password/reset")
+bp.add_route(view.ResetPasswordVerifyView.as_view(), "/password/reset/<email>/<verify_code>")
