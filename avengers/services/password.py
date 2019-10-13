@@ -39,6 +39,7 @@ class ResetPasswordService:
         if not saved_key or key != saved_key:
             raise InvalidVerificationKey
 
+        await self.reset_pw_repo.delete_verify_key(email)
         await self.reset_pw_repo.set_verified_email(email)
 
     async def reset_password(self, email: str, password: str):
@@ -50,6 +51,8 @@ class ResetPasswordService:
         verified_email = await self.reset_pw_repo.get_verified_email(email)
         if not verified_email:
             raise InvalidVerificationKey
+
+        await self.reset_pw_repo.delete_verified_email(email)
 
         password = generate_password_hash(password)
         await self.user_repo.update(email, {'password': password})
