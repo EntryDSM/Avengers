@@ -98,12 +98,7 @@ class ApplicationService:
             "conversion_score": user.conversion_score,
             "final_score": user.final_score
         }
-
-        print(scores)
-
         application = await self.get(email)
-
-        print("asdfasdfasdf")
 
         if isinstance(application, GedApplicationModel):
             scores["ged_average_score"] = application.ged_average_score
