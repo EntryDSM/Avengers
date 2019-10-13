@@ -140,3 +140,33 @@ class UserTokenRepository(RedisRepository):
         await self.db.delete(
             self.key_template.format(email), self.key_template.format(pair)
         )
+
+
+class ResetPasswordRepository(RedisRepository):
+    key_template = "avengers:password_reset:{}"
+
+    async def set_verify_key(self, email: str, key: str) -> None:
+        await self.delete_verify_key(email)
+
+        await self.db.set(
+            self.key_template.format(email), key)
+
+    async def set_verified_email(self, email: str) -> None:
+        await self.delete_verify_key(email)
+
+        await self.db.set(
+            self.key_template.format("verified:" + email), dict(verified=True)
+        )
+
+    async def get_verify_key(self, email: str) -> str:
+        return await self.db.get(self.key_template.format(email))
+
+    async def get_verified_email(self, email: str):
+        saved = await self.db.get(self.key_template.format("verified:" + email))
+        return saved["verified"] if saved else None
+
+    async def delete_verify_key(self, email) -> None:
+        await self.db.delete(self.key_template.format(email))
+
+    async def delete_verified_email(self, email: str) -> None:
+        await self.db.delete(self.key_template.format("verified:" + email))
