@@ -301,6 +301,9 @@ class GEDApplicationView(HTTPMethodView):
         except ValidationError:
             raise InvalidApplication
 
+        if raw_application["ged_grade"]["ged_average_score"] < Decimal(60):
+            raise InvalidApplication
+
         application = {"user_email": token.jwt_identity}
         for v in raw_application.values():
             application.update(v)

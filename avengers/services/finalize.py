@@ -56,6 +56,8 @@ class FinalizeApplicationService:
             raise FinalValidationFailed
 
         if isinstance(application, GedApplicationModel):
+            if application.ged_average_score < decimal.Decimal(60):
+                raise FinalValidationFailed
             grades = await _process_ged_grades(application)
 
         else:
