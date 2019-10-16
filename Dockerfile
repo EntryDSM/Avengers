@@ -25,11 +25,16 @@ ENV GITHUB_TOKEN $GITHUB_TOKEN
 ENV RUN_ENV $RUN_ENV
 ENV SERVICE_NAME avengers
 
+# AWS API key to use SES
+ENV AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
+ENV AWS_SECRET_KEY $AWS_SECRET_KEY
+
 COPY --from=build /wheels /wheels
 
 RUN pip install -r /wheels/requirements.txt -f /wheels && \
     rm -rf /wheels && \
-    rm -rf /root/.cache/pip/*
+    rm -rf /root/.cache/pip/* && \
+    pip --no-cache-dir install --upgrade awscli
 
 WORKDIR /app
 

@@ -5,7 +5,7 @@ class ErrorCodes:
     # code 10xx server error
     redis_error = 1002
     mysql_error = 1003
-    sendgrid_error = 1004
+    email_error = 1004
 
     # code 11xx application validation error
     validation_error = 1100
@@ -30,6 +30,7 @@ class ErrorDescriptions:
         "Our service is currently unavailable. Please try again later."
     )
     ERR_DATABASE = "Something went wrong."
+    ERR_EMAIL = "Email error occurred."
 
     ERR_APPLICATION_PATCH_VALIDATION = "Invalid application submitted."
     ERR_APPLICATION_FINAL_SUBMIT_VALIDATION = (

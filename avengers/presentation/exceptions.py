@@ -25,9 +25,9 @@ class MySQLOperationError(AvengersException):
 
 
 @add_status_code(503)
-class SendgridError(AvengersException):
-    error_code = error_codes.sendgrid_error
-    descriptions = descriptions.ERR_DATABASE
+class EmailError(AvengersException):
+    error_code = error_codes.email_error
+    descriptions = descriptions.ERR_EMAIL
 
 
 @add_status_code(400)

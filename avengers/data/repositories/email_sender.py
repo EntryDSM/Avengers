@@ -1,25 +1,40 @@
-from python_http_client.exceptions import BadRequestsError, UnauthorizedError
-from sendgrid import Mail, SendGridAPIClient
+import boto3
+from botocore.exceptions import ClientError
 
 from avengers.config import settings
-from avengers.presentation.exceptions import SendgridError
+from avengers.presentation.exceptions import EmailError
 
 
 class EmailSenderRepository:
+    CHARSET = 'UTF-8'
+    CONFIGURATION_SET = "ConfigSet"
+    SENDER = "Daedeok Software Meister High School <entrydsm@dsm.hs.kr>"
+
     @classmethod
-    async def send_mail(cls, address: str, title: str, content: str):
-        message = Mail(
-            from_email="entrydsm@dsm.hs.kr",
-            to_emails=address,
-            subject=title,
-            html_content=content,
-        )
+    async def send_mail(cls, recipient: str, title: str, content: str):
+        client = boto3.client('ses', region_name=settings.SES_REGION)
 
         try:
-            client = SendGridAPIClient(settings.SENDGRID_API_KEY)
-            response = client.send(message)
+            response = client.send_email(
+                Destination={
+                    'ToAddresses': [
+                        recipient,
+                    ]
+                },
+                Message={
+                    'Body': {
+                        'Html': {
+                            'Charset': cls.CHARSET,
+                            'Data': content,
+                        },
+                    },
+                    'Subject': {
+                        'Charset': cls.CHARSET,
+                        'Data': title,
+                    },
+                },
+                Source=cls.SENDER,
+            )
 
-            return response.status_code
-
-        except BadRequestsError or UnauthorizedError:
-            raise SendgridError
+        except ClientError as e:
+            raise EmailError(e.response['Error']['Message'])
