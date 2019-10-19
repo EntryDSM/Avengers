@@ -143,36 +143,28 @@ async def _process_applicant_grades(application: BaseCommonApplication):
     is_first_grade_empty = first_grade_li == ['X', 'X']
     is_second_grade_empty = second_grade_li == ['X', 'X']
 
+    validated_first_grade = [
+        s for s in first_grade_li if isinstance(s, decimal.Decimal)
+    ]
+    validated_second_grade = [
+        s for s in second_grade_li if isinstance(s, decimal.Decimal)
+    ]
+
     if is_first_grade_empty and is_second_grade_empty:
         first_grade_score = second_grade_score = third_grade_score
     elif is_first_grade_empty and not is_second_grade_empty:
+        second_grade_score = _check_half_grade_score(validated_second_grade)
         first_grade_score = (
-            sum(second_grade_li) + third_grade_score
-        ) * decimal.Decimal('0.5')
-        second_grade_score = sum(second_grade_li)
+                                second_grade_score + third_grade_score
+                            ) * decimal.Decimal('0.5')
     elif not is_first_grade_empty and is_second_grade_empty:
-        first_grade_score = sum(first_grade_li)
+        first_grade_score = _check_half_grade_score(validated_first_grade)
         second_grade_score = (
-            sum(first_grade_li) + third_grade_score
-        ) * decimal.Decimal('0.5')
+                                 first_grade_score + third_grade_score
+                             ) * decimal.Decimal('0.5')
     else:
-        validated_first_grade = [
-            s for s in first_grade_li if isinstance(s, decimal.Decimal)
-        ]
-        validated_second_grade = [
-            s for s in second_grade_li if isinstance(s, decimal.Decimal)
-        ]
-
-        first_grade_score = (
-            validated_first_grade[0] * 2
-            if len(validated_first_grade) == 1
-            else sum(validated_first_grade)
-        )
-        second_grade_score = (
-            validated_second_grade[0] * 2
-            if len(validated_second_grade) == 1
-            else sum(validated_second_grade)
-        )
+        first_grade_score = _check_half_grade_score(validated_first_grade)
+        second_grade_score = _check_half_grade_score(validated_second_grade)
 
     multiple12 = decimal.Decimal('2.7')
     multiple3 = decimal.Decimal('3.6')
@@ -181,9 +173,17 @@ async def _process_applicant_grades(application: BaseCommonApplication):
         multiple12 = decimal.Decimal('4.5')
         multiple3 = 6
 
-    first_grade_score *= multiple12
-    second_grade_score *= multiple12
-    third_grade_score *= multiple3
+    first_grade_score = decimal.Decimal(
+        first_grade_score * multiple12
+    ).quantize(decimal.Decimal("0.001"), decimal.ROUND_HALF_UP)
+
+    second_grade_score = decimal.Decimal(
+        second_grade_score * multiple12
+    ).quantize(decimal.Decimal("0.001"), decimal.ROUND_HALF_UP)
+
+    third_grade_score = decimal.Decimal(
+        third_grade_score * multiple3
+    ).quantize(decimal.Decimal("0.001"), decimal.ROUND_HALF_UP)
 
     conversion_score = decimal.Decimal(
         first_grade_score + second_grade_score + third_grade_score
@@ -239,8 +239,8 @@ def _calculate_attendance_score(
     full_cut_count: int,
 ) -> int:
     conversion_absence_days: int = (
-        period_cut_count + late_count + early_leave_count
-    ) // 3
+                                       period_cut_count + late_count + early_leave_count
+                                   ) // 3
     total_absence_days: int = full_cut_count + conversion_absence_days
 
     if total_absence_days >= 15:
@@ -249,3 +249,11 @@ def _calculate_attendance_score(
         attendance_score = 15 - total_absence_days
 
     return attendance_score
+
+
+def _check_half_grade_score(validated_grade: list):
+    return (
+        validated_grade[0] * 2
+        if len(validated_grade) == 1
+        else sum(validated_grade)
+    )
