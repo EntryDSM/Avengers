@@ -99,7 +99,7 @@ class PreUserRepository(RedisRepository):
                 self.key_template.format(verification_key): asdict(pre_user),
                 self.key_template.format(pre_user.email): asdict(pre_user),
             },
-            expire_time=timedelta(minutes=3).seconds,
+            expire_time=timedelta(minutes=10).seconds,
         )
 
     async def get(self, key: str) -> PreUserModel:
